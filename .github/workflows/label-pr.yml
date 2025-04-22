@@ -1,0 +1,37 @@
+name: Label PR by Folder
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  label-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+
+      - name: Add frontend label
+        if: |
+          contains(steps.changed-files.outputs.all_changed_files, 'wwwroot/') ||
+          contains(steps.changed-files.outputs.all_changed_files, 'Views/')
+        run: |
+          gh pr edit $PR_NUMBER --add-label "frontend"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+
+      - name: Add backend label
+        if: |
+          contains(steps.changed-files.outputs.all_changed_files, 'Controllers/') ||
+          contains(steps.changed-files.outputs.all_changed_files, 'Models/') ||
+          contains(steps.changed-files.outputs.all_changed_files, 'Data/')
+        run: |
+          gh pr edit $PR_NUMBER --add-label "backend"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
