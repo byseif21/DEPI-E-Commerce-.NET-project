@@ -1,0 +1,125 @@
+﻿@model List<Styleza.Models.Product>
+@{
+    ViewData["Title"] = "Shop";
+    var categories = ViewBag.Categories as List<StylezaShop.Models.Category>;
+}
+<section class="shop-section">
+    <div class="container">
+        <div class="shop-header">
+            <h2 class="section-title">Shop</h2>
+        </div>
+        <div class="shop-content">
+            <div class="shop-sidebar">
+                <div class="filter-group">
+                    <h3>Categories</h3>
+                    <ul class="category-list">
+                        <li><a href="#" data-category="all" class="active">All Products</a></li>
+                        @foreach (var category in categories)
+                        {
+                                <li><a href="#" data-category="@category.Name.ToLower()">@category.Name</a></li>
+                        }
+                    </ul>
+                </div>
+                <div class="filter-group">
+                    <h3>Price Range</h3>
+                    <div class="price-filter">
+                        <div class="price-input">
+                            <label>Min</label>
+                            <input type="number" value="0">
+                        </div>
+                        <div class="price-input">
+                            <label>Max</label>
+                            <input type="number" value="500">
+                        </div>
+                        <button class="filter-btn">Apply</button>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <h3>Colors</h3>
+                    <div class="color-options">
+                        <span class="color-filter" style="background-color: #000000;"></span>
+                        <span class="color-filter" style="background-color: #4682B4;"></span>
+                        <span class="color-filter" style="background-color: #8B4513;"></span>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <h3>Sizes</h3>
+                    <div class="size-options">
+                        <span class="size-filter">S</span>
+                        <span class="size-filter active">M</span>
+                        <span class="size-filter">L</span>
+                        <span class="size-filter">XL</span>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <h3>Tags</h3>
+                    <div class="tag-options">
+                        <a href="#" class="tag">Trendy</a>
+                        <a href="#" class="tag">Classic</a>
+                        <a href="#" class="tag">Fashion</a>
+                        <a href="#" class="tag">Luxury</a>
+                    </div>
+                </div>
+            </div>
+            <div class="shop-main">
+                <div class="shop-controls">
+                    <div class="products-found">Showing 1–@Math.Min(Model.Count, 9) of @Model.Count results</div>
+                    <div class="shop-view">
+                        <button class="view-btn active"><i class="fas fa-th"></i></button>
+                        <button class="view-btn"><i class="fas fa-list"></i></button>
+                    </div>
+                    <div class="shop-sort">
+                        <select>
+                            <option value="default">Default sorting</option>
+                            <option value="popularity">Sort by popularity</option>
+                            <option value="rating">Sort by average rating</option>
+                            <option value="latest">Sort by latest</option>
+                            <option value="price-low">Sort by price: low to high</option>
+                            <option value="price-high">Sort by price: high to low</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="products-grid grid-view">
+                    @foreach (var product in Model)
+                    {
+                            <div class="product-card">
+                                <div class="product-img-container">
+                                    <img src="@product.ImageUrl" class="product-img" alt="@product.Name">
+                                    <div class="product-actions">
+                                        <div class="product-action"><i class="far fa-heart"></i></div>
+                                        <div class="product-action"><i class="fas fa-eye"></i></div>
+                                        <div class="product-action"><i class="fas fa-sync-alt"></i></div>
+                                    </div>
+                                    <div class="product-label">New</div>
+                                @if (!product.IsInStock)
+                                {
+                                            <div class="out-of-stock-overlay">Out of Stock</div>
+                                }
+                                </div>
+                                <div class="product-info">
+                                    <div class="product-category">@product.Category.Name</div>
+                                    <h3 class="product-title">@product.Name</h3>
+                                    <div class="product-price">
+                                        <div class="current-price">$@product.Price</div>
+                                    @if (product.OldPrice.HasValue)
+                                    {
+                                                <div class="old-price">$@product.OldPrice</div>
+                                    }
+                                    </div>
+                                    <a href="/Products/Preview/@product.Id" class="add-to-cart" data-product-id="@product.Id" @(product.IsInStock ? "" : "class=disabled")>View Details</a>
+                                </div>
+                            </div>
+                    }
+                </div>
+                <div class="pagination">
+                    <div class="page-item active">1</div>
+                    <div class="page-item">2</div>
+                    <div class="page-item">3</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts {
+        <script src="/shop.js"></script>
+}

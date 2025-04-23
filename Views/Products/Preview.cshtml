@@ -1,0 +1,124 @@
+﻿@model Styleza.Models.Product
+@{
+    ViewData["Title"] = @Model.Name;
+}
+<section class="preview-section">
+    <div class="container">
+        <div class="preview-content">
+            <div class="preview-images">
+                <div class="main-image">
+                    <img src="@Model.ImageUrl" alt="@Model.Name">
+                </div>
+                <div class="thumbnail-images">
+                    <img src="@Model.ImageUrl" class="thumbnail active" data-src="@Model.ImageUrl" alt="Thumbnail 1">
+                    <!-- we may consider adding more thumbnails for different angles/colors if available -->
+                </div>
+            </div>
+            <div class="preview-details">
+                <div class="product-category">@Model.Category.Name</div>
+                <h2 class="product-title">@Model.Name</h2>
+                <div class="product-price">
+                    <span class="current-price">$@Model.Price</span>
+                    @if (Model.OldPrice.HasValue)
+                    {
+                        <span class="old-price">$@Model.OldPrice</span>
+                    }
+                </div>
+                <div class="product-description">
+                    <p>@Model.Description</p>
+                </div>
+                <div class="product-meta">
+                    <div class="product-size">
+                        <h4>Size:</h4>
+                        <div class="size-options">
+                            <span class="size-option" data-size="S">S</span>
+                            <span class="size-option active" data-size="M">M</span>
+                            <span class="size-option" data-size="L">L</span>
+                            <span class="size-option" data-size="XL">XL</span>
+                        </div>
+                    </div>
+                    <div class="product-color">
+                        <h4>Color:</h4>
+                        <div class="color-options">
+                            <span class="color-option" style="background-color: #000000;" data-color="Black"></span>
+                            <span class="color-option active" style="background-color: #4682B4;" data-color="Blue"></span>
+                            <span class="color-option" style="background-color: #8B4513;" data-color="Brown"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-quantity">
+                    <h4>Quantity:</h4>
+                    <div class="quantity-selector">
+                        <span class="qty-btn minus">-</span>
+                        <input type="text" value="1" class="qty-input">
+                        <span class="qty-btn plus">+</span>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="add-to-cart-btn" data-product-id="@Model.Id" @(Model.IsInStock ? "" : "disabled")>Add to Cart</button>
+                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                    <button class="compare-btn"><i class="fas fa-sync-alt"></i></button>
+                </div>
+                <div class="product-info-extra">
+                    <p><strong>SKU:</strong> @Model.Category.Name.Substring(0, 3).ToUpper()@((new Random()).Next(1000, 9999))</p>
+                    <p><strong>Categories:</strong> @Model.Category.Name, Fashion</p>
+                    <p><strong>Tags:</strong> @Model.Tags</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts {
+    <script>
+        document.querySelector('.add-to-cart-btn').addEventListener('click', async function () {
+            if (this.disabled) {
+                alert('Sorry, this product is out of stock.');
+                return;
+            }
+            const productId = this.dataset.productId;
+            const quantity = parseInt(document.querySelector('.qty-input').value);
+            const response = await fetch('/Cart/AddToCart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId: parseInt(productId), quantity })
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert(result.message);
+                const cartCount = document.querySelector('.cart-count');
+                cartCount.textContent = parseInt(cartCount.textContent) + quantity;
+            } else {
+                alert('Please log in to add items to cart.');
+                window.location.href = '/Identity/Account/Login';
+            }
+        });
+
+        document.querySelectorAll('.size-option').forEach(option => {
+            option.addEventListener('click', function () {
+                document.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function () {
+                document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        document.querySelector('.qty-btn.minus').addEventListener('click', () => {
+            const qtyInput = document.querySelector('.qty-input');
+            const currentValue = parseInt(qtyInput.value);
+            if (currentValue > 1) {
+                qtyInput.value = currentValue - 1;
+            }
+        });
+
+        document.querySelector('.qty-btn.plus').addEventListener('click', () => {
+            const qtyInput = document.querySelector('.qty-input');
+            const currentValue = parseInt(qtyInput.value);
+            qtyInput.value = currentValue + 1;
+        });
+    </script>
+}

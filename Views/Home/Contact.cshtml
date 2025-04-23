@@ -1,0 +1,88 @@
+﻿@model StylezaShop.Models.ContactFormModel
+@{
+    ViewData["Title"] = "Contact Us";
+}
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-slider">
+        <div class="hero-slide slide-1">
+            <div class="container">
+                <div class="hero-content">
+                    <h3 class="hero-subtitle">We’re Here</h3>
+                    <h1 class="hero-title">Contact Us</h1>
+                    <a asp-fragment="contact-form" class="hero-btn">Get in Touch</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Form Section -->
+<section class="section" id="contact-form">
+    <div class="container">
+        <div class="section-header">
+            <h3 class="section-subtitle">Let’s Talk</h3>
+            <h2 class="section-title">Send Us a Message</h2>
+        </div>
+        <form asp-controller="Contact" asp-action="Submit" class="newsletter-form contact-form" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-row">
+                <div>
+                    <input asp-for="Name" class="newsletter-input" placeholder="Your Name" required>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div>
+                    <input asp-for="Email" class="newsletter-input" placeholder="Your Email" required>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
+            <div>
+                <input asp-for="Subject" class="newsletter-input full-width" placeholder="Subject" required>
+                <span asp-validation-for="Subject" class="text-danger"></span>
+            </div>
+            <div>
+                <textarea asp-for="Message" class="newsletter-input full-width" placeholder="Your Message" rows="5" required></textarea>
+                <span asp-validation-for="Message" class="text-danger"></span>
+            </div>
+            <button type="submit" class="newsletter-btn">Submit</button>
+            @Html.AntiForgeryToken()
+        </form>
+    </div>
+</section>
+
+<!-- Info Section -->
+<section class="section featured-section">
+    <div class="container">
+        <div class="section-header">
+            <h3 class="section-subtitle">Find Us</h3>
+            <h2 class="section-title">Contact Details</h2>
+        </div>
+        <div class="categories">
+            <div class="category-card">
+                <div class="category-content">
+                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <h3 class="category-title">Address</h3>
+                    <p>123 Fashion Street, New York, NY 10001</p>
+                </div>
+            </div>
+            <div class="category-card">
+                <div class="category-content">
+                    <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                    <h3 class="category-title">Phone</h3>
+                    <p><a href="tel:+15551234567">+1 (555) 123-4567</a></p>
+                </div>
+            </div>
+            <div class="category-card">
+                <div class="category-content">
+                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                    <h3 class="category-title">Email</h3>
+                    <p><a href="mailto:info@styleza.com">info@styleza.com</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
