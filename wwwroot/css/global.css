@@ -1,0 +1,42 @@
+﻿:root {
+    --primary: #2a2d45;
+    --secondary: #f27d42;
+    --accent: #6c63ff;
+    --light: #f5f5f7;
+    --dark: #1a1a1a;
+    --success: #4caf50;
+    --font-primary: 'Montserrat', sans-serif;
+    --font-secondary: 'Playfair Display', serif;
+    --transition: all 0.3s ease;
+    --shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    --border-radius: 4px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-primary);
+    color: var(--dark);
+    background-color: var(--light);
+    overflow-x: hidden;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
