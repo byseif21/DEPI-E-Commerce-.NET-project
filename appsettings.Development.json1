@@ -1,0 +1,10 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}
+
+/******* REMOVE THE 1 IN THE NAME OF THE FILES TO MAKE SURE THEY ARE JUST JSON FILES TO MAKE THIS WORKS PLEASE *******/
