@@ -41,6 +41,7 @@ Styleza/
 │   └── label-pr.yml        # Auto-labeling pull requests
 ├── Program.cs              # App startup
 ├── appsettings.json        # Configurations (DB connection, etc.)
+    └── appsettings.Development.json 
 ├── .gitignore              # Files/folders to exclude from Git
 └── Styleza.sln             # Visual Studio solution file
 ```
@@ -75,6 +76,7 @@ Styleza/
    - Ensure .NET 8 SDK is installed
 
 3. **Configure the Database**
+   - Rename any file ends with `.json1` to be just `.json `
    - Edit your connection string in `appsettings.json`:
      ```json
      "ConnectionStrings": {
@@ -82,13 +84,13 @@ Styleza/
      }
      ```
 
-4. **Apply Migrations**
+5. **Apply Migrations**
    ```bash
    dotnet ef migrations add InitialCreate
    dotnet ef database update
    ```
 
-5. **Run the App**
+6. **Run the App**
    - Press **F5** in Visual Studio or run:
      ```bash
      dotnet run
@@ -118,6 +120,7 @@ git checkout -b factor/product-catalog
 - `fix:` For bug fixes or resolving issues (e.g., `fix: cart total issue`)
 - `refactor:` For code refactoring without changing behavior (e.g., `refactor: simplify cart logic`)
 - `impr:` For performance, UX, or readability improvements (e.g., `impr: enhance checkout loading speed`)
+- `doc:` For documentation updates or additions (e.g.,`doc: update README with setup instructions`)
 
 ---
 
