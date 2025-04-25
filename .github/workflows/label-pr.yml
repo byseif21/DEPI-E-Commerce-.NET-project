@@ -20,7 +20,7 @@ jobs:
           contains(steps.changed-files.outputs.all_changed_files, 'wwwroot/') ||
           contains(steps.changed-files.outputs.all_changed_files, 'Views/')
         run: |
-          gh pr edit $PR_NUMBER --add-label "frontend"
+          gh pr edit $PR_NUMBER --add-label "Frontend"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -31,7 +31,7 @@ jobs:
           contains(steps.changed-files.outputs.all_changed_files, 'Models/') ||
           contains(steps.changed-files.outputs.all_changed_files, 'Data/')
         run: |
-          gh pr edit $PR_NUMBER --add-label "backend"
+          gh pr edit $PR_NUMBER --add-label "Backend"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
