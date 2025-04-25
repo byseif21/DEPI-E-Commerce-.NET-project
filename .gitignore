@@ -3,6 +3,15 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# Ignore migrations folder
+/Data/Migrations/
+
+# Ignore sensitive app settings
+appsettings.json
+appsettings.Development.json
+connectionstrings.json
+secrets.json
+
 # dotenv files
 .env
 
