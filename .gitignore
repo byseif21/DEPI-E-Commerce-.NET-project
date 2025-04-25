@@ -4,7 +4,7 @@
 ## Get latest from `dotnet new gitignore`
 
 # Ignore migrations folder
-/Data/Migrations/
+Data/Migrations/
 
 # Ignore sensitive app settings
 appsettings.json
