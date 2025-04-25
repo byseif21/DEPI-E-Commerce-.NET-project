@@ -1,10 +1,14 @@
 ﻿@using Styleza.Data
 @using Styleza.Models
 @using Microsoft.AspNetCore.Identity
-@inject StylezaContext DbContext
+@inject ApplicationDbContext DbContext
 @inject UserManager<IdentityUser> UserManager
 @{
-    ViewData["Title"] = "Elevate Your Fashion";
+    ViewData["Title"] = "Home";
+    @section Styles {
+        <link rel="stylesheet" href="~/css/home.css" />
+    }
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <!-- Hero Section -->
 <section class="hero">
@@ -67,7 +71,7 @@
             @foreach (var product in DbContext.Products.OrderBy(p => Guid.NewGuid()).Take(4))
             {
                 var primaryImage = DbContext.ProductImages.FirstOrDefault(pi => pi.ProductId == product.Id && pi.IsPrimary)?.ImageUrl ?? "/asset/img/placeholder.png";
-                var label = product.OldPrice.HasValue ? "Sale" : (product.StockQuantity > 0 ? "New" : "Hot");
+                var label = product.OldPrice > 0 ? "Sale" : (product.StockQuantity > 0 ? "New" : "Hot");
                 <div class="product-card">
                     <div class="product-img-container">
                         <img src="@primaryImage" class="product-img" alt="@product.Name">
@@ -89,7 +93,7 @@
                         <h3 class="product-title">@product.Name</h3>
                         <div class="product-price">
                             <div class="current-price">$@product.Price.ToString("F2")</div>
-                            @if (product.OldPrice.HasValue)
+                            @if (product.OldPrice.HasValue && product.OldPrice > 0)
                             {
                                 <div class="old-price">$@product.OldPrice.Value.ToString("F2")</div>
                             }
@@ -176,12 +180,12 @@
     <div class="container">
         <div class="section-header">
             <h3 class="section-subtitle">Follow Us</h3>
-            <h2 class="section-title">@styleza_fashion</h2>
+            <h2 class="section-title">@* @ *@styleza_fashion</h2>
         </div>
         <div class="instagram-gallery">
             @for (int i = 1; i <= 6; i++)
             {
-                var img = i % 2 == 0 ? "/asset/img/instagram-flat-post-mockup.png" : "/asset/img/instagram-flat-post-mockup 2.png";
+                var img = i % 2 == 0 ? "/asset/img/instagram-flat-post-mockup.png" : "~/asset/img/instagram-flat-post-mockup 2.png";
                 <div class="instagram-item">
                     <img src="@img" class="instagram-img" alt="Instagram Post">
                     <div class="instagram-overlay">

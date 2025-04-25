@@ -1,7 +1,8 @@
 ﻿@model List<Styleza.Models.Product>
 @{
     ViewData["Title"] = "Shop";
-    var categories = ViewBag.Categories as List<StylezaShop.Models.Category>;
+	Layout = "~/Views/Shared/_Layout.cshtml";
+    var categories = ViewBag.Categories as List<Styleza.Models.Category>;
 }
 <section class="shop-section">
     <div class="container">
