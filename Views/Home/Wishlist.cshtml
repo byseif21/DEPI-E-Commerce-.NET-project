@@ -1,0 +1,19 @@
+﻿@model List<Styleza.Models.Wishlist>
+@{
+    ViewData["Title"] = "My Wishlist";
+}
+<section class="section">
+    <div class="container">
+        <h2>My Wishlist</h2>
+        <div class="products-grid">
+            @foreach (var item in Model)
+            {
+                <div class="product-card">
+                    <img src="@item.Product.Images.FirstOrDefault(i => i.IsPrimary)?.ImageUrl" alt="@item.Product.Name" />
+                    <h3>@item.Product.Name</h3>
+                    <p>$@item.Product.Price.ToString("F2")</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>

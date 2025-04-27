@@ -1,0 +1,29 @@
+﻿@model Styleza.Models.Order
+@{
+    ViewData["Title"] = "Order Confirmation";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<section class="order-confirmation-section">
+    <div class="container">
+        <h2 class="section-title">Thank You for Your Order!</h2>
+        <div class="order-details">
+            <p>Order ID: @Model.Id</p>
+            <p>Order Date: @Model.OrderDate.ToString("MMMM dd, yyyy")</p>
+            <p>Total: $@Model.TotalAmount</p>
+            <h3>Items</h3>
+            @foreach (var item in Model.OrderItems)
+            {
+                <div class="order-item">
+                    <div class="order-item-img">
+                        <img src="@item.Product.ImageUrl" alt="@item.Product.Name">
+                    </div>
+                    <div class="order-item-info">
+                        <h4>@item.Product.Name</h4>
+                        <p>@item.Quantity × $@item.Price</p>
+                    </div>
+                </div>
+            }
+        </div>
+        <a href="/Products/Shop" class="continue-shopping-btn">Continue Shopping</a>
+    </div>
+</section>

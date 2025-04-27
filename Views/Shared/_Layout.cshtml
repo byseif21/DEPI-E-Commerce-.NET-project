@@ -1,50 +1,284 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using Styleza.Data
+@using Styleza.Models
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject ApplicationDbContext DbContext
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Styleza</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Styleza.styles.css" asp-append-version="true" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styleza - @ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/global.css" />
+    <link rel="stylesheet" href="~/css/header.css" />
+    <link rel="stylesheet" href="~/css/footer.css" />
+    <link rel="stylesheet" href="~/css/mini-cart.css" />
+    <link rel="stylesheet" href="~/css/product-card.css" />
+    @RenderSection("Styles", required: false)
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="~/asset/img/styleza.png">
 </head>
 <body>
+    <!-- Header -->
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Styleza</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
+        <div class="container header-container">
+            <div class="logo">
+                Style<span>Za</span>
+            </div>
+
+            <nav class="main-navigation">
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a asp-controller="Home" asp-action="Index" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-controller="Products" asp-action="Shop" class="nav-link">Shop</a>
+                        <div class="dropdown-menu mega-menu">
+                            <div class="dropdown-content">
+                                <div class="dropdown-column">
+                                    <h3 class="dropdown-title">Women</h3>
+                                    <ul class="dropdown-links">
+                                        @foreach (var category in DbContext.Categories.Where(c => c.Name.Contains("Women") || c.SubCategories.Any(sc => sc.Name.Contains("Women"))).Take(5))
+                                        {
+                                            <li><a asp-controller="Products" asp-action="Shop" asp-route-category="@category.Name.ToLower()">@category.Name</a></li>
+                                        }
+                                    </ul>
+                                </div>
+                                <div class="dropdown-column">
+                                    <h3 class="dropdown-title">Men</h3>
+                                    <ul class="dropdown-links">
+                                        @foreach (var category in DbContext.Categories.Where(c => c.Name.Contains("Men") || c.SubCategories.Any(sc => sc.Name.Contains("Men"))).Take(5))
+                                        {
+                                            <li><a asp-controller="Products" asp-action="Shop" asp-route-category="@category.Name.ToLower()">@category.Name</a></li>
+                                        }
+                                    </ul>
+                                </div>
+                                <div class="dropdown-column">
+                                    <div class="featured-product">
+                                        <div class="featured-product-img">
+                                            <img src="/asset/img/leather Jacket.png" alt="Featured Product">
+                                            <span class="featured-badge">New</span>
+                                        </div>
+                                        <h4 class="featured-product-title">Premium Leather Jacket</h4>
+                                        <div class="featured-product-price">$299.99</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item has-dropdown">
+                        <a href="#" class="nav-link">Collections</a>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-content">
+                                <div class="dropdown-column">
+                                    <h3 class="dropdown-title">Seasonal</h3>
+                                    <ul class="dropdown-links">
+                                        <li><a href="#">Spring/Summer 2025</a></li>
+                                        <li><a href="#">Fall/Winter 2024</a></li>
+                                        <li><a href="#">Resort Collection</a></li>
+                                        <li><a href="#">Holiday Specials</a></li>
+                                    </ul>
+                                </div>
+                                <div class="dropdown-column">
+                                    <h3 class="dropdown-title">Designer Series</h3>
+                                    <ul class="dropdown-links">
+                                        <li><a href="#">Urban Minimalist</a></li>
+                                        <li><a href="#">Vintage Revival</a></li>
+                                        <li><a href="#">Modern Elegance</a></li>
+                                        <li><a href="#">Eco-Friendly</a></li>
+                                    </ul>
+                                </div>
+                                <div class="dropdown-column collection-showcase">
+                                    <div class="collection-grid">
+                                        <div class="collection-item">
+                                            <img src="/asset/img/spring-fashion.jpg" alt="Collection Preview">
+                                            <div class="collection-overlay">Spring</div>
+                                        </div>
+                                        <div class="collection-item">
+                                            <img src="/asset/img/summer.jpg" alt="Collection Preview">
+                                            <div class="collection-overlay">Summer</div>
+                                        </div>
+                                        <div class="collection-item">
+                                            <img src="/asset/img/Fall.png" alt="Collection Preview">
+                                            <div class="collection-overlay">Fall</div>
+                                        </div>
+                                        <div class="collection-item">
+                                            <img src="/asset/img/winter.jpg" alt="Collection Preview">
+                                            <div class="collection-overlay">Winter</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-controller="Home" asp-action="About" class="nav-link">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-controller="Home" asp-action="Contact" class="nav-link">Contact</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="search-overlay">
+                <div class="search-container">
+                    <div class="search-header">
+                        <h3>Search for products</h3>
+                        <div class="search-close"><i class="fas fa-times"></i></div>
+                    </div>
+                    <div class="search-form">
+                        <input type="text" placeholder="Search for products...">
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="search-popular">
+                        <h4>Popular Searches:</h4>
+                        <div class="popular-tags">
+                            <a asp-controller="Products" asp-action="Shop" asp-route-tags="Dresses">Dresses</a>
+                            <a asp-controller="Products" asp-action="Shop" asp-route-tags="Jackets">Jackets</a>
+                            <a asp-controller="Products" asp-action="Shop" asp-route-tags="Shoes">Shoes</a>
+                            <a asp-controller="Products" asp-action="Shop" asp-route-tags="Accessories">Accessories</a>
+                            <a asp-controller="Products" asp-action="Shop" asp-route-tags="New Arrivals">New Arrivals</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Styleza - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="nav-icons">
+                <div class="nav-icon"><i class="fas fa-search" id="search-toggle"></i></div>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <div class="nav-icon">
+                        <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"><i class="far fa-user"></i></a>
+                    </div>
+                    <div class="nav-icon">
+                        <a asp-controller="Home" asp-action="Wishlist"><i class="far fa-heart"></i></a>
+                    </div>
+                    <div class="nav-icon cart-icon">
+                        <a asp-controller="Cart" asp-action="Index"><i class="fas fa-shopping-bag"></i></a>
+                        @{
+                            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                            var cartCount = userId != null ? DbContext.CartItems.Count(c => c.UserId == userId) : 0;
+                        }
+                        <span class="cart-count">@cartCount</span>
+                    </div>
+                    <div class="nav-icon">
+                        <a asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">Logout</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="nav-icon">
+                        <a asp-area="Identity" asp-page="/Account/Login"><i class="far fa-user"></i></a>
+                    </div>
+                    <div class="nav-icon">
+                        <a asp-controller="Home" asp-action="Wishlist"><i class="far fa-heart"></i></a>
+                    </div>
+                    <div class="nav-icon cart-icon">
+                        <a asp-controller="Cart" asp-action="Index"><i class="fas fa-shopping-bag"></i></a>
+                        <span class="cart-count">0</span>
+                    </div>
+                    <div class="nav-icon">
+                        <a asp-area="Identity" asp-page="/Account/Register">Register</a>
+                    </div>
+                }
+            </div>
+
+            <div class="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+
+        <div class="mobile-menu">
+            <div class="mobile-menu-header">
+                <div class="logo">Style<span>Za</span></div>
+                <div class="mobile-close"><i class="fas fa-times"></i></div>
+            </div>
+            <ul class="mobile-nav-links">
+                <li class="mobile-nav-item">
+                    <a asp-controller="Home" asp-action="Index" class="mobile-nav-link">Home</a>
+                </li>
+                <li class="mobile-nav-item has-submenu">
+                    <div class="mobile-nav-toggle">
+                        <a asp-controller="Products" asp-action="Shop" class="mobile-nav-link">Shop</a>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <ul class="mobile-submenu">
+                        <li><h3>Women</h3></li>
+                        @foreach (var category in DbContext.Categories.Where(c => c.Name.Contains("Women") || c.SubCategories.Any(sc => sc.Name.Contains("Women"))).Take(5))
+                        {
+                            <li><a asp-controller="Products" asp-action="Shop" asp-route-category="@category.Name.ToLower()">@category.Name</a></li>
+                        }
+                        <li><h3>Men</h3></li>
+                        @foreach (var category in DbContext.Categories.Where(c => c.Name.Contains("Men") || c.SubCategories.Any(sc => sc.Name.Contains("Men"))).Take(5))
+                        {
+                            <li><a asp-controller="Products" asp-action="Shop" asp-route-category="@category.Name.ToLower()">@category.Name</a></li>
+                        }
+                    </ul>
+                </li>
+                <li class="mobile-nav-item has-submenu">
+                    <div class="mobile-nav-toggle">
+                        <a href="#" class="mobile-nav-link">Collections</a>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <ul class="mobile-submenu">
+                        <li><h3>Seasonal</h3></li>
+                        <li><a href="#">Spring/Summer 2025</a></li>
+                        <li><a href="#">Fall/Winter 2024</a></li>
+                        <li><a href="#">Resort Collection</a></li>
+                        <li><a href="#">Holiday Specials</a></li>
+                        <li><h3>Designer Series</h3></li>
+                        <li><a href="#">Urban Minimalist</a></li>
+                        <li><a href="#">Vintage Revival</a></li>
+                        <li><a href="#">Modern Elegance</a></li>
+                        <li><a href="#">Eco-Friendly</a></li>
+                    </ul>
+                </li>
+                <li class="mobile-nav-item">
+                    <a asp-controller="Home" asp-action="About" class="mobile-nav-link">About</a>
+                </li>
+                <li class="mobile-nav-item">
+                    <a asp-controller="Home" asp-action="Contact" class="mobile-nav-link">Contact</a>
+                </li>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <li class="mobile-nav-item">
+                        <a asp-area="Identity" asp-page="/Account/Manage/Index" class="mobile-nav-link">Profile</a>
+                    </li>
+                    <li class="mobile-nav-item">
+                        <a asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" class="mobile-nav-link">Logout</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="mobile-nav-item">
+                        <a asp-area="Identity" asp-page="/Account/Login" class="mobile-nav-link">Login</a>
+                    </li>
+                    <li class="mobile-nav-item">
+                        <a asp-area="Identity" asp-page="/Account/Register" class="mobile-nav-link">Register</a>
+                    </li>
+                }
+            </ul>
+            <div class="mobile-nav-footer">
+                <div class="mobile-nav-footer-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    @RenderBody()
+
+    <!-- Footer -->
+    <partial name="_Footer" />
+
+    <!-- Scripts -->
+    <script src="/home.js"></script>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

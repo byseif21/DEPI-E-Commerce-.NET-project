@@ -1,8 +1,254 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using Styleza.Data
+@using Styleza.Models
+@using Microsoft.AspNetCore.Identity
+@inject ApplicationDbContext DbContext
+@inject UserManager<IdentityUser> UserManager
+@{
+    ViewData["Title"] = "Home";
+    @section Styles {
+        <link rel="stylesheet" href="~/css/home.css" />
+    }
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-slider">
+        <div class="hero-slide slide-1">
+            <div class="container">
+                <div class="hero-content">
+                    <h3 class="hero-subtitle">New Collection 2025</h3>
+                    <h1 class="hero-title">Elevate Your Style This Season</h1>
+                    <a asp-controller="Products" asp-action="Shop" class="hero-btn">Shop Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="hero-slide slide-2">
+            <div class="container">
+                <div class="hero-content">
+                    <h3 class="hero-subtitle">Premium Selection</h3>
+                    <h1 class="hero-title">Discover Unique Fashion Pieces</h1>
+                    <a asp-controller="Products" asp-action="Shop" class="hero-btn">Explore</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="slider-controls">
+        <div class="slider-dot active"></div>
+        <div class="slider-dot"></div>
+    </div>
+</section>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Categories Section -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h3 class="section-subtitle">Discover Now</h3>
+            <h2 class="section-title">Shop By Category</h2>
+        </div>
+        <div class="categories">
+            @foreach (var category in DbContext.Categories.Where(c => c.ParentCategoryId == null).Take(3))
+            {
+                <div class="category-card">
+                    <img src="/asset/img/@(category.Name.ToLower()).png" class="category-img" alt="@category.Name Fashion">
+                    <div class="category-content">
+                        <h3 class="category-title">@category.Name</h3>
+                        <a asp-controller="Products" asp-action="Shop" asp-route-category="@category.Name.ToLower()" class="category-link">Shop Now <span>→</span></a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="section featured-section">
+    <div class="container">
+        <div class="section-header">
+            <h3 class="section-subtitle">Handpicked</h3>
+            <h2 class="section-title">Featured Products</h2>
+        </div>
+        <div class="products-grid">
+            @foreach (var product in DbContext.Products.OrderBy(p => Guid.NewGuid()).Take(4))
+            {
+                var primaryImage = DbContext.ProductImages.FirstOrDefault(pi => pi.ProductId == product.Id && pi.IsPrimary)?.ImageUrl ?? "/asset/img/placeholder.png";
+                var label = product.OldPrice > 0 ? "Sale" : (product.StockQuantity > 0 ? "New" : "Hot");
+                <div class="product-card">
+                    <div class="product-img-container">
+                        <img src="@primaryImage" class="product-img" alt="@product.Name">
+                        <div class="product-actions">
+                            <div class="product-action">
+                                <a asp-controller="Home" asp-action="AddToWishlist" asp-route-productId="@product.Id"><i class="far fa-heart"></i></a>
+                            </div>
+                            <div class="product-action">
+                                <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id"><i class="fas fa-search"></i></a>
+                            </div>
+                            <div class="product-action">
+                                <a href="#" class="compare"><i class="fas fa-sync-alt"></i></a>
+                            </div>
+                        </div>
+                        <div class="product-label">@label</div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">@DbContext.Categories.FirstOrDefault(c => c.Id == product.CategoryId)?.Name</div>
+                        <h3 class="product-title">@product.Name</h3>
+                        <div class="product-price">
+                            <div class="current-price">$@product.Price.ToString("F2")</div>
+                            @if (product.OldPrice.HasValue && product.OldPrice > 0)
+                            {
+                                <div class="old-price">$@product.OldPrice.Value.ToString("F2")</div>
+                            }
+                        </div>
+                        <a asp-controller="Cart" asp-action="AddToCart" asp-route-productId="@product.Id" class="add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Collection Banner -->
+        <div class="collection-banner">
+            <div class="collection-img"></div>
+            <div class="collection-content">
+                <h3 class="collection-subtitle">Limited Offer</h3>
+                <h2 class="collection-title">Spring Collection 2025</h2>
+                <p class="collection-text">Experience the perfect blend of comfort and style with our new Spring Collection. Limited pieces available for a short time only.</p>
+                <div class="countdown">
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="days">15</div>
+                        <div class="countdown-text">Days</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="hours">08</div>
+                        <div class="countdown-text">Hours</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="minutes">45</div>
+                        <div class="countdown-text">Mins</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number" id="seconds">30</div>
+                        <div class="countdown-text">Secs</div>
+                    </div>
+                </div>
+                <a asp-controller="Products" asp-action="Shop" asp-route-tags="Spring" class="collection-btn">Shop Collection</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h3 class="section-subtitle">What They Say</h3>
+            <h2 class="section-title">Customer Reviews</h2>
+        </div>
+        <div class="testimonials-container">
+            <div class="testimonial-slider">
+                <div class="testimonial-slides">
+                    <div class="testimonial-slide">
+                        <p class="testimonial-text">"I absolutely love the quality of clothes from Styleza. Everything fits perfectly and the materials are top-notch. The customer service is also exceptional, making my shopping experience truly delightful."</p>
+                        <div class="testimonial-author">
+                            <div class="author-img">
+                                <img src="/asset/img/cas1.png" alt="Customer">
+                            </div>
+                            <div class="author-name">Emma Johnson</div>
+                            <div class="author-title">Regular Customer</div>
+                        </div>
+                    </div>
+                    <div class="testimonial-slide">
+                        <p class="testimonial-text">"Styleza has transformed my wardrobe with their unique designs. The attention to detail and trendy selections keep me coming back. Fast shipping and hassle-free returns make online shopping so convenient."</p>
+                        <div class="testimonial-author">
+                            <div class="author-img">
+                                <img src="/asset/img/cas2.png" alt="Customer">
+                            </div>
+                            <div class="author-name">Michael Roberts</div>
+                            <div class="author-title">Fashion Enthusiast</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-arrows">
+                <div class="testimonial-arrow prev"><i class="fas fa-arrow-left"></i></div>
+                <div class="testimonial-arrow next"><i class="fas fa-arrow-right"></i></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Instagram Section -->
+<section class="section instagram-section">
+    <div class="container">
+        <div class="section-header">
+            <h3 class="section-subtitle">Follow Us</h3>
+            <h2 class="section-title">@* @ *@styleza_fashion</h2>
+        </div>
+        <div class="instagram-gallery">
+            @for (int i = 1; i <= 6; i++)
+            {
+                var img = i % 2 == 0 ? "/asset/img/instagram-flat-post-mockup.png" : "~/asset/img/instagram-flat-post-mockup 2.png";
+                <div class="instagram-item">
+                    <img src="@img" class="instagram-img" alt="Instagram Post">
+                    <div class="instagram-overlay">
+                        <div class="instagram-icon"><i class="fab fa-instagram"></i></div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="instagram-handle">
+            <i class="fab fa-instagram"></i> <a href="https://www.instagram.com/styleza_fashion" target="_blank">Follow us on Instagram</a>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter-section">
+    <div class="container">
+        <h2 class="newsletter-title">Subscribe to Our Newsletter</h2>
+        <p class="newsletter-text">Stay updated with our latest collections, exclusive offers, and fashion tips. Join our community today.</p>
+        <form asp-controller="Newsletter" asp-action="Subscribe" class="newsletter-form" method="post">
+            <input type="email" name="email" class="newsletter-input" placeholder="Your email address" required>
+            <button type="submit" class="newsletter-btn">Subscribe</button>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Ensure home.js handles countdown timer
+        document.addEventListener('DOMContentLoaded', function () {
+            function startCountdown() {
+                const endDate = new Date();
+                endDate.setDate(endDate.getDate() + 15);
+                endDate.setHours(8, 45, 30);
+
+                function updateCountdown() {
+                    const now = new Date();
+                    const timeLeft = endDate - now;
+
+                    if (timeLeft <= 0) {
+                        document.getElementById('days').textContent = '00';
+                        document.getElementById('hours').textContent = '00';
+                        document.getElementById('minutes').textContent = '00';
+                        document.getElementById('seconds').textContent = '00';
+                        return;
+                    }
+
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                    document.getElementById('days').textContent = days.toString().padStart(2, '0');
+                    document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                    document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                    document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+                }
+
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
+            }
+
+            startCountdown();
+        });
+    </script>
+}

@@ -1,0 +1,73 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+<footer>
+    <div class="container">
+        <div class="footer-top">
+            <div class="footer-column">
+                <div class="footer-logo">Style<span>za</span></div>
+                <p class="footer-about">Styleza is a premium fashion brand offering curated collections for modern men and women. We believe in quality, sustainability, and timeless style.</p>
+                <div class="footer-social">
+                    <a href="https://www.facebook.com/styleza_fashion" class="social-icon" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.twitter.com/styleza_fashion" class="social-icon" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="https://www.instagram.com/styleza_fashion" class="social-icon" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.pinterest.com/styleza_fashion" class="social-icon" target="_blank" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3 class="footer-title">Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a asp-controller="Products" asp-action="Shop">Shop</a></li>
+                    <li><a asp-controller="Home" asp-action="About">About Us</a></li>
+                    <li><a asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    <li><a asp-controller="Home" asp-action="Faq">FAQs</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3 class="footer-title">Customer Service</h3>
+                <ul class="footer-links">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <li><a asp-area="Identity" asp-page="/Account/Manage/Index">My Account</a></li>
+                    }
+                    else
+                    {
+                        <li><a asp-area="Identity" asp-page="/Account/Login">My Account</a></li>
+                    }
+                    <li><a asp-controller="Orders" asp-action="Track">Track Order</a></li>
+                    <li><a asp-controller="Home" asp-action="ShippingReturns">Shipping & Returns</a></li>
+                    <li><a asp-controller="Home" asp-action="PrivacyPolicy">Privacy Policy</a></li>
+                    <li><a asp-controller="Home" asp-action="TermsConditions">Terms & Conditions</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3 class="footer-title">Contact Us</h3>
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="contact-text">123 Fashion Street, New York, NY 10001</div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                    <div class="contact-text">+1 (555) 123-4567</div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="contact-text"><a href="mailto:info@styleza.com">info@styleza.com</a></div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-clock"></i></div>
+                    <div class="contact-text">Mon-Fri: 9am - 6pm</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="copyright">© @DateTime.Now.Year Styleza. All Rights Reserved.</div>
+            <div class="payment-methods">
+                <div class="payment-icon"><i class="fab fa-cc-visa"></i></div>
+                <div class="payment-icon"><i class="fab fa-cc-mastercard"></i></div>
+                <div class="payment-icon"><i class="fab fa-cc-amex"></i></div>
+                <div class="payment-icon"><i class="fab fa-cc-paypal"></i></div>
+            </div>
+        </div>
+    </div>
+</footer>
