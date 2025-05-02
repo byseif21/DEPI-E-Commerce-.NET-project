@@ -1,0 +1,197 @@
+/* Import fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+/* Global styles */
+body {
+    font-family: var(--font-primary);
+    background-color: var(--light);
+    color: var(--dark);
+    min-height: 100vh;
+}
+
+/* Account page styling */
+.account-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(rgba(42, 45, 69, 0.85), rgba(26, 26, 26, 0.9)), url('../images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    padding: 40px 0;
+}
+
+.account-form-container {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: var(--border-radius);
+    padding: 40px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+    .account-form-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 6px;
+        height: 100%;
+        background: var(--secondary);
+    }
+
+    .account-form-container h2 {
+        font-family: var(--font-secondary);
+        color: var(--primary);
+        font-weight: 600;
+        margin-bottom: 25px;
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+        .account-form-container h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--secondary);
+        }
+
+/* Form elements styling */
+.form-group label {
+    font-weight: 500;
+    color: var(--primary);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-control {
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    padding: 12px 15px;
+    height: auto;
+    font-size: 15px;
+    transition: var(--transition);
+}
+
+    .form-control:focus {
+        box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        border-color: var(--accent);
+    }
+
+/* Checkbox styling */
+.checkbox label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.checkbox input[type="checkbox"] {
+    margin-right: 8px;
+    accent-color: var(--accent);
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: var(--primary);
+    border: none;
+    padding: 12px 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+    .btn-primary:hover, .btn-primary:focus {
+        background-color: var(--secondary);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(242, 125, 66, 0.4);
+    }
+
+/* Links styling */
+.account-form-container a {
+    color: var(--accent);
+    transition: var(--transition);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+    .account-form-container a:hover {
+        color: var(--secondary);
+        text-decoration: underline;
+    }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .account-form-container {
+        padding: 25px;
+    }
+
+        .account-form-container::before {
+            width: 4px;
+        }
+}
+
+/* Animation effects */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.account-form-container {
+    animation: fadeIn 0.6s ease forwards;
+}
+
+/* Error messages styling */
+.text-danger {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Success message styling */
+.alert-success {
+    background-color: var(--success);
+    color: white;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+}
+
+/* Additional branding element */
+.brand-corner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 80px;
+    overflow: hidden;
+}
+
+    .brand-corner::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 80px 80px 0;
+        border-color: transparent var(--accent) transparent transparent;
+        opacity: 0.8;
+    }
