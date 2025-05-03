@@ -46,16 +46,27 @@
             <h2 class="section-title">Shop By Category</h2>
         </div>
         <div class="categories">
-            @foreach (var category in DbContext.Categories.Where(c => c.ParentCategoryId == null).Take(3))
-            {
-                <div class="category-card">
-                    <img src="/asset/img/@(category.Name.ToLower()).png" class="category-img" alt="@category.Name Fashion">
-                    <div class="category-content">
-                        <h3 class="category-title">@category.Name</h3>
-                        <a asp-controller="Products" asp-action="Shop" asp-route-category="@category.Name.ToLower()" class="category-link">Shop Now <span>→</span></a>
-                    </div>
+            <div class="category-card">
+                <img src="~/asset/img/women.png" class="category-img" alt="Women's Fashion">
+                <div class="category-content">
+                    <h3 class="category-title">Women</h3>
+                    <a asp-controller="Products" asp-action="Shop" asp-route-category="women" class="category-link">Shop Now <span>→</span></a>
                 </div>
-            }
+            </div>
+            <div class="category-card">
+                <img src="~/asset/img/men.png" class="category-img" alt="Men's Fashion">
+                <div class="category-content">
+                    <h3 class="category-title">Men</h3>
+                    <a asp-controller="Products" asp-action="Shop" asp-route-category="men" class="category-link">Shop Now <span>→</span></a>
+                </div>
+            </div>
+            <div class="category-card">
+                <img src="~/asset/img/accessories.jpg" class="category-img" alt="Accessories">
+                <div class="category-content">
+                    <h3 class="category-title">Accessories</h3>
+                    <a asp-controller="Products" asp-action="Shop" asp-route-category="accessories" class="category-link">Shop Now <span>→</span></a>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -185,7 +196,7 @@
         <div class="instagram-gallery">
             @for (int i = 1; i <= 6; i++)
             {
-                var img = i % 2 == 0 ? "/asset/img/instagram-flat-post-mockup.png" : "~/asset/img/instagram-flat-post-mockup 2.png";
+                var img = i % 2 == 0 ? "/asset/img/instagram-flat-post-mockup.png" : "/asset/img/instagram-flat-post-mockup 2.png";
                 <div class="instagram-item">
                     <img src="@img" class="instagram-img" alt="Instagram Post">
                     <div class="instagram-overlay">
