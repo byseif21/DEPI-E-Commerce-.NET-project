@@ -14,6 +14,9 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
+// Register email sender service
+builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, Styleza.Services.EmailSender>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
