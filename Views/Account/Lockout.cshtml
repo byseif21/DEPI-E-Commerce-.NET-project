@@ -1,0 +1,28 @@
+@{
+    ViewData["Title"] = "Account Locked";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/account.css" />
+}
+
+<div class="account-page">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="account-form-container">
+                    <h2 class="text-center mb-4">Account Locked</h2>
+                    <div class="alert alert-danger">
+                        <p>
+                            This account has been locked out due to too many failed login attempts. 
+                            Please try again later or contact support for assistance.
+                        </p>
+                    </div>
+                    <div class="form-group mb-3 text-center">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Return to Homepage</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

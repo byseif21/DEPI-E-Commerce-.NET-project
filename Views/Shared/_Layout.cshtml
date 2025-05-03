@@ -172,7 +172,7 @@
                 else
                 {
                     <div class="nav-icon">
-                        <a asp-area="Identity" asp-page="/Account/Login"><i class="far fa-user"></i></a>
+                        <a asp-controller="Account" asp-action="Login"><i class="far fa-user"></i></a>
                     </div>
                     <div class="nav-icon">
                         <a asp-controller="Home" asp-action="Wishlist"><i class="far fa-heart"></i></a>
@@ -181,9 +181,9 @@
                         <a asp-controller="Cart" asp-action="Index"><i class="fas fa-shopping-bag"></i></a>
                         <span class="cart-count">0</span>
                     </div>
-                    <div class="nav-icon">
-                        <a asp-area="Identity" asp-page="/Account/Register">Register</a>
-                    </div>
+                    @* <div class="nav-icon">
+                        <a asp-controller="Account" asp-action="Register">Register</a>
+                    </div> *@
                 }
             </div>
 
@@ -255,10 +255,10 @@
                 else
                 {
                     <li class="mobile-nav-item">
-                        <a asp-area="Identity" asp-page="/Account/Login" class="mobile-nav-link">Login</a>
+                        <a asp-controller="Account" asp-action="Login" class="mobile-nav-link">Login</a>
                     </li>
                     <li class="mobile-nav-item">
-                        <a asp-area="Identity" asp-page="/Account/Register" class="mobile-nav-link">Register</a>
+                        <a asp-controller="Account" asp-action="Register" class="mobile-nav-link">Register</a>
                     </li>
                 }
             </ul>
