@@ -81,17 +81,22 @@ document.addEventListener('DOMContentLoaded', function () {
     // Color filters
     colorFilters.forEach(colorFilter => {
         colorFilter.addEventListener('click', function () {
+            // Color filtering is now handled by the updateFilter function in Shop.cshtml
+            // This event listener is kept for client-side filtering when needed
             this.classList.toggle('active');
             const colorStyle = this.getAttribute('style');
-            const color = colorStyle.match(/background-color: (#[0-9A-F]{6}|[a-z]+);/i)[1];
-
-            if (this.classList.contains('active')) {
-                activeFilters.colors.push(color);
-            } else {
-                activeFilters.colors = activeFilters.colors.filter(c => c !== color);
+            const color = colorStyle.match(/background-color: (#[0-9A-F]{6}|[a-z]+)/i)?.[1];
+            
+            if (color) {
+                if (this.classList.contains('active')) {
+                    activeFilters.colors.push(color);
+                } else {
+                    activeFilters.colors = activeFilters.colors.filter(c => c !== color);
+                }
+                
+                // Client-side filtering for immediate feedback
+                filterProducts();
             }
-
-            filterProducts();
         });
     });
 
@@ -129,21 +134,26 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // View switcher (grid/list)
-    viewBtns.forEach(btn => {
-        btn.addEventListener('click', function () {
-            viewBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
+    if (viewBtns && viewBtns.length > 0) {
+        viewBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                viewBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
 
-            const viewType = this.querySelector('i').classList.contains('fa-th') ? 'grid' : 'list';
-            changeView(viewType);
+                const viewType = this.querySelector('i').classList.contains('fa-th') ? 'grid' : 'list';
+                changeView(viewType);
+            });
         });
-    });
+    }
 
     // Sorting products
-    sortSelect.addEventListener('change', function () {
-        currentSort = this.value.toLowerCase().replace(/\s+/g, '-');
-        sortProducts();
-    });
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function () {
+            // use the direct value from the select element which matches the controller's expected format
+            currentSort = this.value;
+            sortProducts();
+        });
+    }
 
     // Pagination
     paginationItems.forEach(item => {
@@ -197,19 +207,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Mobile menu toggle function
     function toggleMobileMenu() {
+        // Check if mobile nav already exists
+        if (document.querySelector('.mobile-nav')) return;
+        
         const mobileNav = document.createElement('div');
         mobileNav.className = 'mobile-nav';
         mobileNav.innerHTML = `
             <div class="mobile-nav-header">
-                <a href="index.html" class="logo">Style<span>Za</span></a>
+                <a href="/" class="logo">Style<span>Za</span></a>
                 <div class="close-menu"><i class="fas fa-times"></i></div>
             </div>
             <ul class="mobile-nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="#">Shop</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="#">Blog</a></li>
-                <li><a href="contact.html">Contact</a></li>
+                <li><a href="/">Home</a></li>
+                <li><a href="/Products/Shop">Shop</a></li>
+                <li><a href="/Home/About">About</a></li>
+                <li><a href="/Home/Blog">Blog</a></li>
+                <li><a href="/Home/Contact">Contact</a></li>
             </ul>
             <div class="mobile-nav-footer">
                 <div class="mobile-nav-footer-icons">
@@ -220,22 +233,44 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             </div>
         `;
-
+        
+        // Create overlay for closing when clicking outside
+        const overlay = document.createElement('div');
+        overlay.className = 'mobile-nav-overlay';
+        document.body.appendChild(overlay);
+        
         document.body.appendChild(mobileNav);
         document.body.style.overflow = 'hidden';
 
         setTimeout(() => {
             mobileNav.classList.add('active');
+            overlay.classList.add('active');
         }, 10);
 
+        // Close menu when clicking the close button
         const closeMenu = document.querySelector('.close-menu');
         closeMenu.addEventListener('click', function () {
             mobileNav.classList.remove('active');
+            overlay.classList.remove('active');
             setTimeout(() => {
                 document.body.removeChild(mobileNav);
+                document.body.removeChild(overlay);
                 document.body.style.overflow = '';
             }, 300);
         });
+        
+        // Close menu when clicking outside
+        overlay.addEventListener('click', function() {
+            mobileNav.classList.remove('active');
+            overlay.classList.remove('active');
+            setTimeout(() => {
+                document.body.removeChild(mobileNav);
+                document.body.removeChild(overlay);
+                document.body.style.overflow = '';
+            }, 300);
+        });
+
+
     }
 
     // Update active category
@@ -251,6 +286,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Filter products based on all active filters
     function filterProducts() {
+        // In the actual implementation, filtering is handled server-side via URL parameters
+        // This function is kept for client-side filtering when needed
+        // The updateFilter() function in Shop.cshtml handles the server-side filtering
+        
         let filteredProducts = Array.from(productCards);
 
         // Category filter
@@ -268,9 +307,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return price >= activeFilters.priceMin && price <= activeFilters.priceMax;
         });
 
-        // Apply other filters if implemented (colors, sizes, tags)
-        // This would require actual product data with these attributes
-
         // Update display
         productCards.forEach(card => {
             card.style.display = 'none';
@@ -280,25 +316,30 @@ document.addEventListener('DOMContentLoaded', function () {
             card.style.display = 'block';
         });
 
-        // Update products found count
+        // Update products found count if element exists
         const productsFound = document.querySelector('.products-found');
-        productsFound.textContent = `Showing 1–${Math.min(filteredProducts.length, itemsPerPage)} of ${filteredProducts.length} results`;
+        if (productsFound) {
+            productsFound.textContent = `Showing 1–${Math.min(filteredProducts.length, itemsPerPage)} of ${filteredProducts.length} results`;
+        }
 
         // Reset pagination if needed
-        if (filteredProducts.length <= itemsPerPage) {
-            // Hide pagination if only one page
-            document.querySelector('.pagination').style.display = 'none';
-        } else {
-            document.querySelector('.pagination').style.display = 'flex';
-            // Reset to page 1
-            currentPage = 1;
-            paginationItems.forEach((item, index) => {
-                if (index === 0) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
-            });
+        const pagination = document.querySelector('.pagination');
+        if (pagination) {
+            if (filteredProducts.length <= itemsPerPage) {
+                // Hide pagination if only one page
+                pagination.style.display = 'none';
+            } else {
+                pagination.style.display = 'flex';
+                // Reset to page 1
+                currentPage = 1;
+                paginationItems.forEach((item, index) => {
+                    if (index === 0) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+            }
         }
     }
 
@@ -306,37 +347,45 @@ document.addEventListener('DOMContentLoaded', function () {
     function changeView(viewType) {
         currentView = viewType;
 
-        if (viewType === 'grid') {
-            productsGrid.classList.remove('list-view');
-            productsGrid.classList.add('grid-view');
-        } else {
-            productsGrid.classList.remove('grid-view');
-            productsGrid.classList.add('list-view');
+        if (productsGrid) {
+            if (viewType === 'grid') {
+                productsGrid.classList.remove('list-view');
+                productsGrid.classList.add('grid-view');
+            } else {
+                productsGrid.classList.remove('grid-view');
+                productsGrid.classList.add('list-view');
 
-            // In list view, we might need to adjust the product cards styling
-            productCards.forEach(card => {
-                if (!card.classList.contains('list-view-processed')) {
-                    const productImg = card.querySelector('.product-img-container');
-                    const productInfo = card.querySelector('.product-info');
+                // In list view, we might need to adjust the product cards styling
+                productCards.forEach(card => {
+                    if (!card.classList.contains('list-view-processed')) {
+                        const productImg = card.querySelector('.product-img-container');
+                        const productInfo = card.querySelector('.product-info');
 
-                    card.style.display = 'flex';
-                    productImg.style.width = '30%';
-                    productImg.style.height = '220px';
-                    productInfo.style.width = '70%';
-                    productInfo.style.padding = '20px 30px';
+                        if (productImg && productInfo) {
+                            card.style.display = 'flex';
+                            productImg.style.width = '30%';
+                            productImg.style.height = '220px';
+                            productInfo.style.width = '70%';
+                            productInfo.style.padding = '20px 30px';
 
-                    // Add a short description in list view
-                    const descElement = document.createElement('div');
-                    descElement.className = 'product-description';
-                    descElement.innerHTML = '<p>Premium quality product crafted with the finest materials. Perfect for any occasion.</p>';
+                            // Add a short description in list view
+                            const descElement = document.createElement('div');
+                            descElement.className = 'product-description';
+                            descElement.innerHTML = '<p>Premium quality product crafted with the finest materials. Perfect for any occasion.</p>';
 
-                    // Insert after price and before add to cart button
-                    const addToCartBtn = card.querySelector('.add-to-cart');
-                    productInfo.insertBefore(descElement, addToCartBtn);
+                            // Insert after price and before add to cart button
+                            const addToCartBtn = card.querySelector('.add-to-cart');
+                            if (addToCartBtn) {
+                                productInfo.insertBefore(descElement, addToCartBtn);
+                            } else {
+                                productInfo.appendChild(descElement);
+                            }
 
-                    card.classList.add('list-view-processed');
-                }
-            });
+                            card.classList.add('list-view-processed');
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -345,18 +394,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const products = Array.from(productCards);
 
         switch (currentSort) {
-            case 'sort-by-popularity':
+            case 'popularity':
                 // Simulated popularity (would typically come from backend data)
                 // Here we'll use a data attribute or just randomize for demo
                 products.sort(() => Math.random() - 0.5);
                 break;
 
-            case 'sort-by-average-rating':
+            case 'rating':
                 // Simulated ratings (would typically come from backend data)
                 products.sort(() => Math.random() - 0.5);
                 break;
 
-            case 'sort-by-latest':
+            case 'latest':
                 // Assuming newer products have "New" label
                 products.sort((a, b) => {
                     const aIsNew = a.querySelector('.product-label')?.textContent === 'New' ? 1 : 0;
@@ -365,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 break;
 
-            case 'sort-by-price:-low-to-high':
+            case 'price-low-to-high':
                 products.sort((a, b) => {
                     const aPrice = parseFloat(a.querySelector('.current-price').textContent.replace('$', ''));
                     const bPrice = parseFloat(b.querySelector('.current-price').textContent.replace('$', ''));
@@ -373,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 break;
 
-            case 'sort-by-price:-high-to-low':
+            case 'price-high-to-low':
                 products.sort((a, b) => {
                     const aPrice = parseFloat(a.querySelector('.current-price').textContent.replace('$', ''));
                     const bPrice = parseFloat(b.querySelector('.current-price').textContent.replace('$', ''));
@@ -397,6 +446,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Update pagination
     function updatePagination() {
+        // Note: In the actual implementation, pagination is handled server-side
+        // This function is kept for client-side pagination when needed
+        // The updatePage() function in Shop.cshtml handles the server-side pagination
+        
         const visibleProducts = Array.from(productCards).filter(
             card => card.style.display !== 'none'
         );
@@ -416,15 +469,22 @@ document.addEventListener('DOMContentLoaded', function () {
         const startItem = (currentPage - 1) * itemsPerPage + 1;
         const endItem = Math.min(currentPage * itemsPerPage, visibleProducts.length);
         const productsFound = document.querySelector('.products-found');
-        productsFound.textContent = `Showing ${startItem}–${endItem} of ${visibleProducts.length} results`;
+        if (productsFound) {
+            productsFound.textContent = `Showing ${startItem}–${endItem} of ${visibleProducts.length} results`;
+        }
     }
 
     // Add to cart functionality
     function addToCart(productCard) {
-        const title = productCard.querySelector('.product-title').textContent;
-        const price = productCard.querySelector('.current-price').textContent;
-        const img = productCard.querySelector('.product-img').src;
-        const category = productCard.querySelector('.product-category').textContent;
+        if (!productCard) return;
+        
+        const title = productCard.querySelector('.product-title')?.textContent;
+        const price = productCard.querySelector('.current-price')?.textContent;
+        const img = productCard.querySelector('.product-img')?.src;
+        const category = productCard.querySelector('.product-category')?.textContent;
+        const productId = productCard.querySelector('.add-to-cart')?.getAttribute('data-product-id');
+        
+        if (!title || !price || !img || !category) return;
 
         // Check if product is already in cart
         const existingProductIndex = cart.findIndex(item => item.title === title);
@@ -435,6 +495,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             // Add new product to cart
             cart.push({
+                id: productId,
                 title,
                 price,
                 img,
@@ -456,7 +517,46 @@ document.addEventListener('DOMContentLoaded', function () {
     // Update cart count
     function updateCartCount() {
         const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-        cartCount.textContent = totalItems;
+        if (cartCount) {
+            cartCount.textContent = totalItems;
+        }
+    }
+    
+    // Show notification
+    function showNotification(message) {
+        // Remove any existing notification
+        const existingNotification = document.querySelector('.notification');
+        if (existingNotification) {
+            document.body.removeChild(existingNotification);
+        }
+        
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas fa-check-circle"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        // Add to DOM
+        document.body.appendChild(notification);
+        
+        // Show notification
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+        
+        // Auto hide after 3 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
     }
 
     // Toggle wishlist
@@ -626,7 +726,9 @@ document.addEventListener('DOMContentLoaded', function () {
             updateCartCount();
 
             // Show added to cart notification
-            showNotification(`${title} added to cart!`);
+            if (typeof showNotification === 'function') {
+                showNotification(`${title} added to cart!`);
+            }
 
             // Close modal
             modal.classList.remove('active');
@@ -667,32 +769,46 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Toggle compare list
     function toggleCompare(productCard) {
-        const title = productCard.querySelector('.product-title').textContent;
+        if (!productCard) return;
+        
+        const title = productCard.querySelector('.product-title')?.textContent;
+        if (!title) return;
+        
         const existingIndex = compareList.findIndex(item => item.title === title);
 
         if (existingIndex !== -1) {
             // Remove from compare list
             compareList.splice(existingIndex, 1);
-            showNotification(`${title} removed from compare list!`);
+            if (typeof showNotification === 'function') {
+                showNotification(`${title} removed from compare list!`);
+            }
         } else {
-            // Add to compare list
+            // Add to compare list (limit to 4 items)
             if (compareList.length >= 4) {
-                showNotification('Compare list can only have 4 items. Please remove an item first.');
+                if (typeof showNotification === 'function') {
+                    showNotification('Compare list is full! Remove an item first.');
+                }
                 return;
             }
 
-            const price = productCard.querySelector('.current-price').textContent;
-            const img = productCard.querySelector('.product-img').src;
-            const category = productCard.querySelector('.product-category').textContent;
+            const price = productCard.querySelector('.current-price')?.textContent;
+            const img = productCard.querySelector('.product-img')?.src;
+            const category = productCard.querySelector('.product-category')?.textContent;
+            const productId = productCard.querySelector('.add-to-cart')?.getAttribute('data-product-id');
+            
+            if (!price || !img || !category) return;
 
             compareList.push({
+                id: productId,
                 title,
                 price,
                 img,
                 category
             });
 
-            showNotification(`${title} added to compare list!`);
+            if (typeof showNotification === 'function') {
+                showNotification(`${title} added to compare list!`);
+            }
         }
 
         // Save compare list to localStorage
@@ -701,57 +817,75 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Show mini cart
     function showMiniCart() {
-        if (document.querySelector('.mini-cart')) return;
-
+        // Implementation of mini cart display
+        if (cart.length === 0) {
+            // If cart is empty, show message
+            const miniCart = document.createElement('div');
+            miniCart.className = 'mini-cart';
+            miniCart.innerHTML = `
+                <div class="mini-cart-header">
+                    <h3>Your Cart</h3>
+                    <div class="close-mini-cart"><i class="fas fa-times"></i></div>
+                </div>
+                <div class="mini-cart-body">
+                    <p class="empty-cart-message">Your cart is empty</p>
+                </div>
+            `;
+            document.body.appendChild(miniCart);
+            
+            // Add close functionality
+            const closeBtn = miniCart.querySelector('.close-mini-cart');
+            closeBtn.addEventListener('click', function() {
+                document.body.removeChild(miniCart);
+            });
+            
+            return;
+        }
+        
+        // Create mini cart with items
         const miniCart = document.createElement('div');
         miniCart.className = 'mini-cart';
-
+        
         let cartItemsHTML = '';
-        let cartTotal = 0;
-
-        if (cart.length === 0) {
-            cartItemsHTML = '<div class="empty-cart"><p>Your cart is empty</p></div>';
-        } else {
-            cart.forEach(item => {
-                const itemTotal = parseFloat(item.price.replace('$', '')) * item.quantity;
-                cartTotal += itemTotal;
-
-                cartItemsHTML += `
-                    <div class="cart-item">
-                        <div class="cart-item-img">
-                            <img src="${item.img}" alt="${item.title}">
-                        </div>
-                        <div class="cart-item-info">
-                            <h4 class="cart-item-title">${item.title}</h4>
-                            <div class="cart-item-price">${item.quantity} × ${item.price}</div>
-                        </div>
-                        <div class="cart-item-remove" data-title="${item.title}">
-                            <i class="fas fa-times"></i>
-                        </div>
+        let total = 0;
+        
+        cart.forEach(item => {
+            const itemPrice = parseFloat(item.price.replace('$', ''));
+            const itemTotal = itemPrice * item.quantity;
+            total += itemTotal;
+            
+            cartItemsHTML += `
+                <div class="mini-cart-item">
+                    <div class="item-image">
+                        <img src="${item.img}" alt="${item.title}">
                     </div>
-                `;
-            });
-        }
-
+                    <div class="item-details">
+                        <h4>${item.title}</h4>
+                        <p>${item.quantity} x ${item.price}</p>
+                    </div>
+                    <div class="item-remove" data-title="${item.title}">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
+            `;
+        });
+        
         miniCart.innerHTML = `
-            <div class="mini-cart-overlay"></div>
-            <div class="mini-cart-content">
-                <div class="mini-cart-header">
-                    <h3>Shopping Cart (${cart.length})</h3>
-                    <div class="mini-cart-close"><i class="fas fa-times"></i></div>
+            <div class="mini-cart-header">
+                <h3>Your Cart (${cart.length} items)</h3>
+                <div class="close-mini-cart"><i class="fas fa-times"></i></div>
+            </div>
+            <div class="mini-cart-body">
+                ${cartItemsHTML}
+            </div>
+            <div class="mini-cart-footer">
+                <div class="mini-cart-total">
+                    <span>Total:</span>
+                    <span>$${total.toFixed(2)}</span>
                 </div>
-                <div class="mini-cart-items">
-                    ${cartItemsHTML}
-                </div>
-                <div class="mini-cart-footer">
-                    <div class="mini-cart-total">
-                        <span>Total:</span>
-                        <span>$${cartTotal.toFixed(2)}</span>
-                    </div>
-                    <div class="mini-cart-buttons">
-                        <a href="#" class="view-cart-btn">View Cart</a>
-                        <a href="#" class="checkout-btn">Checkout</a>
-                    </div>
+                <div class="mini-cart-buttons">
+                    <a href="/Cart" class="view-cart-btn">View Cart</a>
+                    <a href="/Checkout" class="checkout-btn">Checkout</a>
                 </div>
             </div>
         `;
