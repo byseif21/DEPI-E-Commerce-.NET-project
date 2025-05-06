@@ -1,126 +1,248 @@
-﻿@model List<Styleza.Models.Product>
+﻿@model Styleza.Models.ShopViewModel
 @{
     ViewData["Title"] = "Shop";
 	Layout = "~/Views/Shared/_Layout.cshtml";
-    var categories = ViewBag.Categories as List<Styleza.Models.Category>;
+    @section Styles {
+        <link rel="stylesheet" href="~/css/shop.css" />
+    }
 }
-<section class="shop-section">
+<!-- Page Header -->
+<section class="page-header">
     <div class="container">
-        <div class="shop-header">
-            <h2 class="section-title">Shop</h2>
+        <h1 class="page-title">Shop Products</h1>
+        <div class="breadcrumb">
+            <a href="@Url.Action("Index", "Home")">Home</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>Shop</span>
         </div>
-        <div class="shop-content">
-            <div class="shop-sidebar">
-                <div class="filter-group">
-                    <h3>Categories</h3>
-                    <ul class="category-list">
-                        <li><a href="#" data-category="all" class="active">All Products</a></li>
-                        @foreach (var category in categories)
-                        {
-                                <li><a href="#" data-category="@category.Name.ToLower()">@category.Name</a></li>
-                        }
-                    </ul>
-                </div>
-                <div class="filter-group">
-                    <h3>Price Range</h3>
-                    <div class="price-filter">
+    </div>
+</section>
+
+<!-- Shop Section -->
+<section class="shop-section">
+    <div class="container shop-container">
+        <!-- Shop Sidebar -->
+        <div class="shop-sidebar">
+            <!-- Categories Widget -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Categories</h3>
+                <ul class="category-list">
+                    <li><a href="@Url.Action("Shop", "Products", new { category = "all" })" class="@(Model.Filters.Category == "all" ? "active" : "")">All Products <span class="category-count">@Model.TotalItems</span></a></li>
+                    @foreach (var cat in Model.Categories)
+                    {
+                        <li><a href="@Url.Action("Shop", "Products", new { category = cat.Category.Name.ToLower() })" class="@(Model.Filters.Category == cat.Category.Name.ToLower() ? "active" : "")">@cat.Category.Name <span class="category-count">@cat.Count</span></a></li>
+                    }
+                </ul>
+            </div>
+
+            <!-- Filter By Price Widget -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Filter By Price</h3>
+                <form class="price-filter" method="get" action="@Url.Action("Shop", "Products")">
+                    <input type="hidden" name="category" value="@Model.Filters.Category" />
+                    <input type="hidden" name="color" value="@String.Join(",", Model.Filters.Colors)" />
+                    <input type="hidden" name="sizes" value="@String.Join(",", Model.Filters.Sizes)" />
+                    <input type="hidden" name="tags" value="@String.Join(",", Model.Filters.Tags)" />
+                    <input type="hidden" name="sort" value="@Model.Filters.Sort" />
+                    <div class="price-inputs">
                         <div class="price-input">
-                            <label>Min</label>
-                            <input type="number" value="0">
+                            <span>$</span>
+                            <input type="number" name="priceMin" placeholder="Min" value="@Model.Filters.PriceMin" min="0">
                         </div>
                         <div class="price-input">
-                            <label>Max</label>
-                            <input type="number" value="500">
+                            <span>$</span>
+                            <input type="number" name="priceMax" placeholder="Max" value="@Model.Filters.PriceMax" min="0">
                         </div>
-                        <button class="filter-btn">Apply</button>
                     </div>
-                </div>
-                <div class="filter-group">
-                    <h3>Colors</h3>
-                    <div class="color-options">
-                        <span class="color-filter" style="background-color: #000000;"></span>
-                        <span class="color-filter" style="background-color: #4682B4;"></span>
-                        <span class="color-filter" style="background-color: #8B4513;"></span>
-                    </div>
-                </div>
-                <div class="filter-group">
-                    <h3>Sizes</h3>
-                    <div class="size-options">
-                        <span class="size-filter">S</span>
-                        <span class="size-filter active">M</span>
-                        <span class="size-filter">L</span>
-                        <span class="size-filter">XL</span>
-                    </div>
-                </div>
-                <div class="filter-group">
-                    <h3>Tags</h3>
-                    <div class="tag-options">
-                        <a href="#" class="tag">Trendy</a>
-                        <a href="#" class="tag">Classic</a>
-                        <a href="#" class="tag">Fashion</a>
-                        <a href="#" class="tag">Luxury</a>
-                    </div>
+                    <button type="submit" class="filter-btn">Filter</button>
+                </form>
+            </div>
+
+            <!-- Filter By Color Widget -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Filter By Color</h3>
+                <div class="color-filters">
+                    @{
+                        var availableColors = new[] {
+                            new { Hex = "#000000", Name = "Black" },
+                            new { Hex = "#FFFFFF", Name = "White" },
+                            new { Hex = "#FF5733", Name = "Orange" },
+                            new { Hex = "#45B8AC", Name = "Teal" },
+                            new { Hex = "#9B59B6", Name = "Purple" },
+                            new { Hex = "#5D9CEC", Name = "Blue" },
+                            new { Hex = "#F5D76E", Name = "Yellow" },
+                            new { Hex = "#D98880", Name = "Pink" }
+                        };
+                    }
+                    @foreach (var color in availableColors)
+                    {
+                        var isActive = Model.Filters.Colors.Contains(color.Hex.ToLower());
+                        <div class="color-filter @(isActive ? "active" : "")" style="background-color: @color.Hex; @(color.Hex == "#FFFFFF" ? "border: 1px solid #eee;" : "")"
+                             data-color="@color.Hex.ToLower()"
+                             onclick="updateFilter('colors', '@color.Hex.ToLower()', this)"></div>
+                    }
                 </div>
             </div>
-            <div class="shop-main">
-                <div class="shop-controls">
-                    <div class="products-found">Showing 1–@Math.Min(Model.Count, 9) of @Model.Count results</div>
+
+            <!-- Filter By Size Widget -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Filter By Size</h3>
+                <div class="size-filters">
+                    @{
+                        var availableSizes = new[] { "XS", "S", "M", "L", "XL", "XXL" };
+                    }
+                    @foreach (var size in availableSizes)
+                    {
+                        var isActive = Model.Filters.Sizes.Contains(size.ToUpper());
+                        <span class="size-filter @(isActive ? "active" : "")" data-size="@size.ToUpper()"
+                              onclick="updateFilter('sizes', '@size.ToUpper()', this)">@size</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Popular Tags Widget -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Popular Tags</h3>
+                <div class="tag-cloud">
+                    @foreach (var tag in Model.Tags)
+                    {
+                        var isActive = Model.Filters.Tags.Contains(tag.Name.ToLower());
+                        <a href="#" class="tag @(isActive ? "active" : "")" data-tag="@tag.Name.ToLower()"
+                           onclick="updateFilter('tags', '@tag.Name.ToLower()', this)">@tag.Name</a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Shop Products -->
+        <div class="shop-products">
+            <!-- Shop Header -->
+            <div class="shop-header">
+                <div class="products-found">Showing @(Math.Min((Model.CurrentPage - 1) * 9 + 1, Model.TotalItems))–@Math.Min(Model.CurrentPage * 9, Model.TotalItems) of @Model.TotalItems results</div>
+                <div class="shop-filters">
                     <div class="shop-view">
-                        <button class="view-btn active"><i class="fas fa-th"></i></button>
-                        <button class="view-btn"><i class="fas fa-list"></i></button>
+                        <div class="view-btn active"><i class="fas fa-th"></i></div>
+                        <div class="view-btn"><i class="fas fa-list"></i></div>
                     </div>
                     <div class="shop-sort">
-                        <select>
-                            <option value="default">Default sorting</option>
-                            <option value="popularity">Sort by popularity</option>
-                            <option value="rating">Sort by average rating</option>
-                            <option value="latest">Sort by latest</option>
-                            <option value="price-low">Sort by price: low to high</option>
-                            <option value="price-high">Sort by price: high to low</option>
+                        <select onchange="updateSort(this.value)">
+                            <option value="default" selected="@(Model.Filters.Sort == "default")">Default sorting</option>
+                            <option value="popularity" selected="@(Model.Filters.Sort == "popularity")">Sort by popularity</option>
+                            <option value="latest" selected="@(Model.Filters.Sort == "latest")">Sort by latest</option>
+                            <option value="price-low-to-high" selected="@(Model.Filters.Sort == "price-low-to-high")">Sort by price: low to high</option>
+                            <option value="price-high-to-low" selected="@(Model.Filters.Sort == "price-high-to-low")">Sort by price: high to low</option>
                         </select>
                     </div>
                 </div>
-                <div class="products-grid grid-view">
-                    @foreach (var product in Model)
-                    {
-                            <div class="product-card">
-                                <div class="product-img-container">
-                                    <img src="@product.ImageUrl" class="product-img" alt="@product.Name">
-                                    <div class="product-actions">
-                                        <div class="product-action"><i class="far fa-heart"></i></div>
-                                        <div class="product-action"><i class="fas fa-eye"></i></div>
-                                        <div class="product-action"><i class="fas fa-sync-alt"></i></div>
-                                    </div>
-                                    <div class="product-label">New</div>
-                                @if (!product.IsInStock)
-                                {
-                                            <div class="out-of-stock-overlay">Out of Stock</div>
-                                }
-                                </div>
-                                <div class="product-info">
-                                    <div class="product-category">@product.Category.Name</div>
-                                    <h3 class="product-title">@product.Name</h3>
-                                    <div class="product-price">
-                                        <div class="current-price">$@product.Price</div>
-                                    @if (product.OldPrice.HasValue)
-                                    {
-                                                <div class="old-price">$@product.OldPrice</div>
-                                    }
-                                    </div>
-                                    <a href="/Products/Preview/@product.Id" class="add-to-cart" data-product-id="@product.Id" @(product.IsInStock ? "" : "class=disabled")>View Details</a>
-                                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="products-grid">
+                @foreach (var product in Model.Products)
+                {
+                    <div class="product-card">
+                        <div class="product-img-container">
+                            <img src="@product.ImageUrl" alt="@product.Name" class="product-img">
+                            <div class="product-actions">
+                                <div class="product-action"><i class="far fa-heart"></i></div>
+                                <div class="product-action"><i class="fas fa-eye"></i></div>
+                                <div class="product-action"><i class="fas fa-sync-alt"></i></div>
                             </div>
+                            @if (product.IsNew)
+                            {
+                                <div class="product-label">New</div>
+                            }
+                            else if (product.IsOnSale)
+                            {
+                                <div class="product-label" style="background-color: #f27d42;">Sale</div>
+                            }
+                            else if (product.IsBestSeller)
+                            {
+                                <div class="product-label" style="background-color: #4caf50;">Best Seller</div>
+                            }
+                            @if (!product.IsInStock)
+                            {
+                                <div class="out-of-stock-overlay">Out of Stock</div>
+                            }
+                        </div>
+                        <div class="product-info">
+                            <div class="product-category">@product.Category</div>
+                            <h3 class="product-title">@product.Name</h3>
+                            <div class="product-price">
+                                <span class="current-price">$@product.CurrentPrice.ToString("F2")</span>
+                                @if (product.OldPrice.HasValue)
+                                {
+                                    <span class="old-price">$@product.OldPrice.Value.ToString("F2")</span>
+                                }
+                            </div>
+                            <a href="#" class="add-to-cart @(product.IsInStock ? "" : "disabled")"
+                               data-product-id="@product.Id">@(product.IsInStock ? "Add to Cart" : "Out of Stock")</a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <div class="pagination">
+                    @for (var i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <div class="page-item @(Model.CurrentPage == i ? "active" : "")"
+                             onclick="updatePage(@i)">@i</div>
+                    }
+                    @if (Model.CurrentPage < Model.TotalPages)
+                    {
+                        <div class="page-item" onclick="updatePage(@(Model.CurrentPage + 1))">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
                     }
                 </div>
-                <div class="pagination">
-                    <div class="page-item active">1</div>
-                    <div class="page-item">2</div>
-                    <div class="page-item">3</div>
-                </div>
-            </div>
+            }
         </div>
     </div>
 </section>
 @section Scripts {
-        <script src="/shop.js"></script>
+        <script src="~/js/shop.js"></script>
+        <script>
+    // Update filter (colors, sizes, tags)
+    function updateFilter(type, value, element) {
+        element.classList.toggle('active');
+        var urlParams = new URLSearchParams(window.location.search);
+        var currentValues = urlParams.get(type)?.split(',')?.filter(v => v) || [];
+
+        if (element.classList.contains('active')) {
+            if (!currentValues.includes(value)) {
+                currentValues.push(value);
+            }
+        } else {
+            currentValues = currentValues.filter(v => v !== value);
+        }
+
+        urlParams.set(type, currentValues.join(','));
+        if (!currentValues.length) urlParams.delete(type);
+
+        window.location.href = '@Url.Action("Shop", "Products")?' + urlParams.toString();
+    }
+
+    // Update sort
+    function updateSort(value) {
+        var urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('sort', value);
+        window.location.href = '@Url.Action("Shop", "Products")?' + urlParams.toString();
+    }
+
+    // Update page
+    function updatePage(page) {
+        var urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('page', page);
+        window.location.href = '@Url.Action("Shop", "Products")?' + urlParams.toString();
+    }
+
+    // Retain existing JavaScript from template
+    document.addEventListener('DOMContentLoaded', function () {
+        // Keep all existing JS logic for client-side interactions
+        @Html.Raw(System.IO.File.ReadAllText(System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/js/shop.js")))
+    });
+</script>
 }
