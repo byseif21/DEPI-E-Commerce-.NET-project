@@ -10,6 +10,9 @@ namespace Styleza.Models
         public string Description { get; set; }
 
         public bool IsInStock { get; set; }
+        public bool IsNew { get; set; }
+        public bool IsOnSale { get; set; }
+        public bool IsBestSeller { get; set; }
 
         public string Color { get; set; }
 
@@ -22,6 +25,8 @@ namespace Styleza.Models
         public decimal Price { get; set; }
         public string ImageUrl { get; set; }
         public string Tags { get; set; }
+        
+        public decimal CurrentPrice => Price;
         
         // Navigation property for product images
         public List<ProductImage> Images { get; set; } = new List<ProductImage>();

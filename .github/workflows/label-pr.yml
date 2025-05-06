@@ -18,7 +18,8 @@ jobs:
       - name: Add frontend label
         if: |
           contains(steps.changed-files.outputs.all_changed_files, 'wwwroot/') ||
-          contains(steps.changed-files.outputs.all_changed_files, 'Views/')
+          contains(steps.changed-files.outputs.all_changed_files, 'Views/') ||
+          contains(steps.changed-files.outputs.all_changed_files, 'Areas/Identity/Pages/') 
         run: |
           gh pr edit $PR_NUMBER --add-label "Frontend"
         env:
@@ -29,9 +30,45 @@ jobs:
         if: |
           contains(steps.changed-files.outputs.all_changed_files, 'Controllers/') ||
           contains(steps.changed-files.outputs.all_changed_files, 'Models/') ||
-          contains(steps.changed-files.outputs.all_changed_files, 'Data/')
+          contains(steps.changed-files.outputs.all_changed_files, 'Data/') ||
+          contains(steps.changed-files.outputs.all_changed_files, 'Services/') ||
+          contains(steps.changed-files.outputs.all_changed_files, 'Program.cs') ||
+          contains(steps.changed-files.outputs.all_changed_files, '.cs')
         run: |
           gh pr edit $PR_NUMBER --add-label "Backend"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          
+      - name: Add configuration label
+        if: |
+          contains(steps.changed-files.outputs.all_changed_files, 'appsettings.json') ||
+          contains(steps.changed-files.outputs.all_changed_files, 'Properties/') ||
+          contains(steps.changed-files.outputs.all_changed_files, '.csproj') ||
+          contains(steps.changed-files.outputs.all_changed_files, '.sln')
+        run: |
+          gh pr edit $PR_NUMBER --add-label "Configuration"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          
+      - name: Add documentation label
+        if: |
+          contains(steps.changed-files.outputs.all_changed_files, 'README.md') ||
+          contains(steps.changed-files.outputs.all_changed_files, '.md') ||
+          contains(steps.changed-files.outputs.all_changed_files, 'docs/')
+        run: |
+          gh pr edit $PR_NUMBER --add-label "Documentation"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          
+      - name: Add CI/CD label
+        if: |
+          contains(steps.changed-files.outputs.all_changed_files, '.github/workflows/') ||
+          contains(steps.changed-files.outputs.all_changed_files, '.github/actions/')
+        run: |
+          gh pr edit $PR_NUMBER --add-label "CI/CD"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
