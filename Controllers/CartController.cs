@@ -28,9 +28,11 @@ namespace Styleza.Controllers
 
             var cart = await _context.Carts
                 .Include(c => c.Items)
+                    .ThenInclude(i => i.Product)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
-            return View(cart);
+
+            return View(cart ?? new Cart { Items = new List<CartItem>() });
         }
 
         [HttpPost]
