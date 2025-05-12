@@ -13,6 +13,13 @@
             <div class="col-md-6 mx-auto">
                 <div class="account-form-container">
                     <h2 class="text-center mb-4">Welcome Back</h2>
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success">
+                            @TempData["SuccessMessage"]
+                        </div>
+                    }
+                    <div asp-validation-summary="All" class="text-danger"></div>
                     <form id="account" method="post" asp-controller="Account" asp-action="Login">
                         <div class="form-group mb-3">
                             <label asp-for="Email">Email</label>

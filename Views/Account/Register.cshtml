@@ -13,6 +13,7 @@
             <div class="col-md-6 mx-auto">
                 <div class="account-form-container">
                     <h2 class="text-center mb-4">Create Account</h2>
+                    <div asp-validation-summary="All" class="text-danger"></div>
                     <form id="registerForm" method="post" asp-controller="Account" asp-action="Register">
                         <div class="form-group mb-3">
                             <label asp-for="Email">Email</label>
