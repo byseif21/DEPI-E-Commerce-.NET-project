@@ -185,7 +185,7 @@
         background-color: var(--primary);
     }
 
-.notification {
+/*.notification {
     position: fixed;
     top: 20px;
     right: 20px;
@@ -213,6 +213,7 @@
         margin-right: 10px;
         font-size: 18px;
     }
+*/
 
 @media (max-width: 480px) {
     .mini-cart,
