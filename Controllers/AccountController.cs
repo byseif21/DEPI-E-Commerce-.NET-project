@@ -36,35 +36,38 @@ namespace Styleza.Controllers
         {
             returnUrl ??= Url.Content("~/");
             
-            if (ModelState.IsValid)
+            // Clear any existing model errors to prevent refresh loops
+            ModelState.Clear();
+            
+            if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-                
-                if (result.Succeeded)
-                {
-                    return LocalRedirect(returnUrl);
-                }
-                if (result.RequiresTwoFactor)
-                {
-                    // For now, we'll just redirect to the login page with an error
-                    ModelState.AddModelError(string.Empty, "Two factor authentication is required but not implemented yet.");
-                    return View(model);
-                }
-                if (result.IsLockedOut)
-                {
-                    return RedirectToAction(nameof(Lockout));
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return View(model);
-                }
+                ModelState.AddModelError(string.Empty, "Email and password are required.");
+                return View(model);
             }
             
-            // If we got this far, something failed, redisplay form
-            return View(model);
+            // This doesn't count login failures towards account lockout
+            // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+            
+            if (result.Succeeded)
+            {
+                return LocalRedirect(returnUrl);
+            }
+            if (result.RequiresTwoFactor)
+            {
+                // For now, we'll just redirect to the login page with an error
+                ModelState.AddModelError(string.Empty, "Two factor authentication is required but not implemented yet.");
+                return View(model);
+            }
+            if (result.IsLockedOut)
+            {
+                return RedirectToAction(nameof(Lockout));
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt. Please check your email and password.");
+                return View(model);
+            }
         }
         
         [HttpGet]
@@ -86,6 +89,23 @@ namespace Styleza.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterModel model)
         {
+            // Clear any existing model errors to prevent refresh loops
+            ModelState.Clear();
+            
+            if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
+            {
+                ModelState.AddModelError(string.Empty, "Email and password are required.");
+                return View(model);
+            }
+            
+            // Check if user already exists
+            var existingUser = await _userManager.FindByEmailAsync(model.Email);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError(string.Empty, "This email is already registered. Please use a different email or login.");
+                return View(model);
+            }
+            
             if (ModelState.IsValid)
             {
                 var user = new IdentityUser { UserName = model.Email, Email = model.Email };
@@ -113,9 +133,9 @@ namespace Styleza.Controllers
                     // For development purposes, we'll also store the URL in ViewData
                     ViewData["ConfirmationLink"] = callbackUrl;
                     
-                    // Sign in the user
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
+                    // Instead of signing in the user, redirect to login page with success message
+                    TempData["SuccessMessage"] = "Registration successful! Please login with your new account.";
+                    return RedirectToAction("Login");
                 }
                 
                 foreach (var error in result.Errors)

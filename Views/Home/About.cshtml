@@ -1,5 +1,75 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "About us";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/about.css"/>
+}
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-slider">
+        <div class="hero-slide slide-1">
+            <div class="container">
+                <div class="hero-content">
+                    <h3 class="hero-subtitle">Our Journey</h3>
+                    <h1 class="hero-title">About Styleza</h1>
+                    <a href="#our-story" class="hero-btn">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Story Section -->
+<section class="section" id="our-story">
+    <div class="container">
+        <div class="section-header">
+            <h3 class="section-subtitle">Who We Are</h3>
+            <h2 class="section-title">Our Story</h2>
+        </div>
+        <div class="collection-banner">
+            <div class="collection-img" style="background: url('@Url.Content("~/asset/img/styleza.png")') center/contain no-repeat;"></div>
+            <div class="collection-content">
+                <h3 class="collection-subtitle">Since 2015</h3>
+                <h2 class="collection-title">Crafting Timeless Fashion</h2>
+                <p class="collection-text">
+                    Styleza was born from a passion for blending modern trends with timeless
+                    elegance. Founded in 2015, we’ve grown into a brand that celebrates individuality,
+                    sustainability, and quality craftsmanship. Our mission is to elevate your wardrobe with pieces
+                    that tell a story and stand the test of time.
+                </p>
+                <a href="@Url.Action("Shop", "Products")" class="collection-btn">Explore Our Collections</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="section featured-section">
+    <div class="container">
+        <div class="section-header">
+            <h3 class="section-subtitle">Meet Us</h3>
+            <h2 class="section-title">Our Team</h2>
+        </div>
+        <div class="products-grid">
+            @foreach (var member in new[] {
+            new { Name = "SOON", Role = "......", Image = "cas3.png" },
+            new { Name = "SOON", Role = ".......", Image = "cas1.png" },
+            new { Name = "SOON", Role = "......", Image = "cas2.png" }
+            })
+            {
+                <div class="product-card">
+                    <div class="product-img-container">
+                        <img src="@Url.Content("~/asset/img/" + member.Image)" class="product-img" alt="@member.Name">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">@member.Name</h3>
+                        <div class="product-category">@member.Role</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
