@@ -1,16 +1,16 @@
-﻿@model List<Styleza.Models.CartItem>
+﻿@model Styleza.Models.Cart
 @{
     ViewData["Title"] = "Checkout";
 }
 <section class="checkout-section">
     <div class="container">
         <h2 class="section-title">Checkout</h2>
-        @if (Model.Any())
+        @if (Model?.Items?.Any() == true)
         {
             <div class="checkout-content">
                 <div class="order-summary">
                     <h3>Order Summary</h3>
-                    @foreach (var item in Model)
+                    @foreach (var item in Model.Items)
                     {
                         <div class="order-item">
                             <div class="order-item-img">
@@ -24,9 +24,10 @@
                     }
                     <div class="order-total">
                         <span>Total:</span>
-                        <span>$@Model.Sum(item => item.Quantity * item.Product.Price)</span>
+                        <span>$@Model.Items.Sum(item => item.Quantity * item.Product.Price)</span>
                     </div>
                 </div>
+
                 <div class="checkout-form">
                     <h3>Billing Details</h3>
                     <form asp-action="PlaceOrder" method="post">

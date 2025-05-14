@@ -172,7 +172,43 @@ document.addEventListener('DOMContentLoaded', function () {
     addToCartBtns.forEach((btn, index) => {
         btn.addEventListener('click', function (e) {
             e.preventDefault();
-            addToCart(productCards[index]);
+            const productCard = productCards[index];
+            const productId = btn.getAttribute('data-product-id');
+            
+            // Add to cart using AJAX
+            fetch(`/Cart/AddToCart?productId=${productId}&quantity=1`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update cart count
+                    const cartCountElements = document.querySelectorAll('.cart-count');
+                    cartCountElements.forEach(el => {
+                        el.textContent = data.cartCount;
+                    });
+                    
+                    // Show notification
+                    showNotification(data.message);
+                    
+                    // Show mini cart 
+                    setTimeout(() => {
+                        if (typeof showMiniCart === 'function') {
+                            showMiniCart();
+                        }
+                    }, 500);
+                } else {
+                    showNotification(data.message || 'Failed to add item to cart');
+                }
+            })
+            .catch(error => {
+                console.error('Error adding to cart:', error);
+                showNotification('Failed to add item to cart. Please try again.');
+            });
         });
     });
 
@@ -197,11 +233,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Cart icon click - show mini cart
-    cartIcon.addEventListener('click', function (e) {
-        e.preventDefault();
-        showMiniCart();
-    });
+    // Cart icon click - show mini cart is now handled in the _Layout.cshtml file
+    // with the onclick attribute
+    
 
     // ----- FUNCTIONS -----
 
@@ -816,127 +850,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Show mini cart
-    function showMiniCart() {
-        // Implementation of mini cart display
-        if (cart.length === 0) {
-            // If cart is empty, show message
-            const miniCart = document.createElement('div');
-            miniCart.className = 'mini-cart';
-            miniCart.innerHTML = `
-                <div class="mini-cart-header">
-                    <h3>Your Cart</h3>
-                    <div class="close-mini-cart"><i class="fas fa-times"></i></div>
-                </div>
-                <div class="mini-cart-body">
-                    <p class="empty-cart-message">Your cart is empty</p>
-                </div>
-            `;
-            document.body.appendChild(miniCart);
-            
-            // Add close functionality
-            const closeBtn = miniCart.querySelector('.close-mini-cart');
-            closeBtn.addEventListener('click', function() {
-                document.body.removeChild(miniCart);
-            });
-            
-            return;
-        }
-        
-        // Create mini cart with items
-        const miniCart = document.createElement('div');
-        miniCart.className = 'mini-cart';
-        
-        let cartItemsHTML = '';
-        let total = 0;
-        
-        cart.forEach(item => {
-            const itemPrice = parseFloat(item.price.replace('$', ''));
-            const itemTotal = itemPrice * item.quantity;
-            total += itemTotal;
-            
-            cartItemsHTML += `
-                <div class="mini-cart-item">
-                    <div class="item-image">
-                        <img src="${item.img}" alt="${item.title}">
-                    </div>
-                    <div class="item-details">
-                        <h4>${item.title}</h4>
-                        <p>${item.quantity} x ${item.price}</p>
-                    </div>
-                    <div class="item-remove" data-title="${item.title}">
-                        <i class="fas fa-times"></i>
-                    </div>
-                </div>
-            `;
-        });
-        
-        miniCart.innerHTML = `
-            <div class="mini-cart-header">
-                <h3>Your Cart (${cart.length} items)</h3>
-                <div class="close-mini-cart"><i class="fas fa-times"></i></div>
-            </div>
-            <div class="mini-cart-body">
-                ${cartItemsHTML}
-            </div>
-            <div class="mini-cart-footer">
-                <div class="mini-cart-total">
-                    <span>Total:</span>
-                    <span>$${total.toFixed(2)}</span>
-                </div>
-                <div class="mini-cart-buttons">
-                    <a href="/Cart" class="view-cart-btn">View Cart</a>
-                    <a href="/Checkout" class="checkout-btn">Checkout</a>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(miniCart);
-
-        setTimeout(() => {
-            miniCart.classList.add('active');
-        }, 10);
-
-        // Close mini cart
-        const closeBtn = miniCart.querySelector('.mini-cart-close');
-        const overlay = miniCart.querySelector('.mini-cart-overlay');
-
-        [closeBtn, overlay].forEach(el => {
-            el.addEventListener('click', () => {
-                miniCart.classList.remove('active');
-                setTimeout(() => {
-                    document.body.removeChild(miniCart);
-                }, 300);
-            });
-        });
-
-        // Remove item from cart
-        const removeButtons = miniCart.querySelectorAll('.cart-item-remove');
-        removeButtons.forEach(btn => {
-            btn.addEventListener('click', function () {
-                const title = this.getAttribute('data-title');
-                removeFromCart(title);
-
-                // Remove item from DOM
-                this.closest('.cart-item').remove();
-
-                // Update cart count
-                updateCartCount();
-
-                // Update cart total
-                updateMiniCartTotal(miniCart);
-
-                // Update cart items count in header
-                const cartHeader = miniCart.querySelector('.mini-cart-header h3');
-                cartHeader.textContent = `Shopping Cart (${cart.length})`;
-
-                // Show empty cart message if needed
-                if (cart.length === 0) {
-                    const cartItems = miniCart.querySelector('.mini-cart-items');
-                    cartItems.innerHTML = '<div class="empty-cart"><p>Your cart is empty</p></div>';
-                }
-            });
-        });
-    }
+    // This function has been moved to cart.js to avoid duplication
 
     // Remove item from cart
     function removeFromCart(title) {

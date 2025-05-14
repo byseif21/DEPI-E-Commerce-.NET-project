@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="~/css/header.css" />
     <link rel="stylesheet" href="~/css/footer.css" />
     <link rel="stylesheet" href="~/css/mini-cart.css" />
+    <link rel="stylesheet" href="~/css/notification.css" />
     <link rel="stylesheet" href="~/css/product-card.css" />
     <link rel="stylesheet" href="~/css/loader.css" />
     @RenderSection("Styles", required: false)
@@ -22,7 +23,7 @@
     <link rel="icon" type="image/x-icon" href="~/asset/img/styleza.png">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-<body>
+<body class="@(User.Identity.IsAuthenticated ? "logged-in" : "")">
     <!-- Loader -->
     @await Html.PartialAsync("_Loader")
     
@@ -161,7 +162,7 @@
                         <a asp-controller="Home" asp-action="Wishlist"><i class="far fa-heart"></i></a>
                     </div>
                     <div class="nav-icon cart-icon">
-                        <a asp-controller="Cart" asp-action="Index"><i class="fas fa-shopping-bag"></i></a>
+                        <a href="javascript:void(0);" onclick="showMiniCart(); return false;"><i class="fas fa-shopping-bag"></i></a>
                         @{
                             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                             var cartCount = userId != null ? DbContext.CartItems.Count(c => c.UserId == userId) : 0;
@@ -181,7 +182,7 @@
                         <a asp-controller="Home" asp-action="Wishlist"><i class="far fa-heart"></i></a>
                     </div>
                     <div class="nav-icon cart-icon">
-                        <a asp-controller="Cart" asp-action="Index"><i class="fas fa-shopping-bag"></i></a>
+                        <a href="javascript:void(0);" onclick="showMiniCart(); return false;"><i class="fas fa-shopping-bag"></i></a>
                         <span class="cart-count">0</span>
                     </div>
                     @* <div class="nav-icon">
@@ -283,8 +284,11 @@
     <partial name="_Footer" />
 
     <!-- Scripts -->
-    <script src="~/js/home.js"></script>
+    <script src="~/js/home.js" asp-append-version="true"></script>
+    <script src="~/js/cart.js"></script>
     <script src="~/js/loader.js"></script>
+    <script src="~/js/wishlist.js" asp-append-version="true"></script>
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>

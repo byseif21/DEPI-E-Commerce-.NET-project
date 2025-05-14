@@ -140,5 +140,7 @@ namespace Styleza.Controllers
 
             return View(product);
         }
+
+
     }
 }
