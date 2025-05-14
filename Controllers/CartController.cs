@@ -72,7 +72,6 @@ namespace Styleza.Controllers
                 cartItem = new CartItem
                 {
                     CartId = cart.Id,
-                    UserId = userId,
                     ProductId = productId,
                     Quantity = quantity
                 };
@@ -139,7 +138,7 @@ namespace Styleza.Controllers
             }
 
             var cartItems = await _context.CartItems
-                .Where(ci => ci.UserId == userId)
+                .Where(ci => ci.Cart.UserId == userId)
                 .Include(ci => ci.Product)
                 .Select(ci => new
                 {
@@ -164,11 +163,27 @@ namespace Styleza.Controllers
             }
 
             var total = await _context.CartItems
-                .Where(ci => ci.UserId == userId)
+                .Where(ci => ci.Cart.UserId == userId)
                 .Include(ci => ci.Product)
                 .SumAsync(ci => ci.Quantity * ci.Product.Price);
 
             return Json(new { total });
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> GetCartCount()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Json(new { count = 0 });
+            }
+
+            var count = await _context.CartItems
+                .Where(ci => ci.Cart.UserId == userId)
+                .SumAsync(ci => ci.Quantity);
+
+            return Json(new { count });
         }
     }
 }

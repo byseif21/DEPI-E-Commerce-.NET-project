@@ -11,32 +11,138 @@
         @if (Model == null || !Model.Any())
         {
             <p>Your wishlist is empty.</p>
+            <div class="empty-wishlist-actions">
+                <a href="/Products/Shop" class="btn btn-primary">Continue Shopping</a>
+            </div>
         }
         else
         {
             <div class="products-grid">
                 @foreach (var item in Model)
                 {
-                    <div class="product-card">
-                        <img src="@item.Product?.Images?.FirstOrDefault(i => i.IsPrimary)?.ImageUrl ?? " /images/default.jpg""
-                             alt="@item.Product?.Name ?? " Product"" />
-
-                        <h3>@item.Product?.Name ?? "Unknown Product"</h3>
-                        <p>
+                    <div class="product-card" data-product-id="@item.ProductId">
+                        <div class="product-card-actions">
+                            <button class="remove-from-wishlist" data-id="@item.Id">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <a href="/Products/Preview/@item.ProductId">
+                            <img src="@item.Product?.Images?.FirstOrDefault(i => i.IsPrimary)?.ImageUrl ?? "/images/default.jpg""
+                                alt="@item.Product?.Name ?? "Product"" />
+                        </a>
+                        <h3><a href="/Products/Preview/@item.ProductId">@item.Product?.Name ?? "Unknown Product"</a></h3>
+                        <p class="product-price">
                             @if (item.Product != null)
                             {
                                 @item.Product.Price.ToString("C2")
-                                // Currency format
-
                             }
                             else
                             {
                                 <span>Price not available</span>
                             }
                         </p>
+                        <div class="product-card-footer">
+                            <button class="add-to-cart-btn" data-product-id="@item.ProductId">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                        </div>
                     </div>
                 }
             </div>
         }
     </div>
 </section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle remove from wishlist
+            document.querySelectorAll('.remove-from-wishlist').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const id = this.dataset.id;
+                    const productCard = this.closest('.product-card');
+                    
+                    try {
+                        const response = await fetch('/Home/RemoveFromWishlist', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({ wishlistItemId: parseInt(id) })
+                        });
+                        
+                        if (response.ok) {
+                            productCard.remove();
+                            
+                            // Check if there are any items left
+                            if (document.querySelectorAll('.product-card').length === 0) {
+                                const container = document.querySelector('.container');
+                                container.innerHTML = `
+                                    <h2>My Wishlist</h2>
+                                    <p>Your wishlist is empty.</p>
+                                    <div class="empty-wishlist-actions">
+                                        <a href="/Products/Shop" class="btn btn-primary">Continue Shopping</a>
+                                    </div>
+                                `;
+                            }
+                            
+                            showNotification('Item removed from wishlist');
+                        }
+                    } catch (error) {
+                        console.error('Error removing item from wishlist:', error);
+                        showNotification('Failed to remove item. Please try again.');
+                    }
+                });
+            });
+            
+            // Handle add to cart
+            document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const productId = this.dataset.productId;
+                    
+                    try {
+                        const response = await fetch('/Cart/AddToCart', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({ productId: parseInt(productId), quantity: 1 })
+                        });
+                        
+                        const result = await response.json();
+                        if (result.success) {
+                            showNotification(result.message || 'Item added to cart');
+                        } else {
+                            showNotification(result.message || 'Failed to add item to cart');
+                        }
+                    } catch (error) {
+                        console.error('Error adding item to cart:', error);
+                        showNotification('Failed to add item to cart. Please try again.');
+                    }
+                });
+            });
+            
+            // Helper function to show notifications
+            function showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 10);
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 3000);
+            }
+        });
+    </script>
+}
