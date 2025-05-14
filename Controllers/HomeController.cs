@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Styleza.Controllers
 {
@@ -24,8 +25,15 @@ namespace Styleza.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var products = _context.Products
+                .Include(p => p.Images)
+                .OrderBy(p => Guid.NewGuid())
+                .Take(4)
+                .ToList();
+
+            return View(products);
         }
+
         public IActionResult About()
         {
             return View();
@@ -34,6 +42,25 @@ namespace Styleza.Controllers
         {
             return View();
         }
+
+        public async Task<IActionResult> Wishlist()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var wishlistItems = await _context.Wishlists
+                .Include(w => w.Product)
+                .ThenInclude(p => p.Images)
+                .Where(w => w.UserId == userId)
+                .ToListAsync();
+
+            return View(wishlistItems);
+        }
+
 
         public IActionResult Privacy()
         {

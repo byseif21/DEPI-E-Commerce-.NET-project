@@ -1,19 +1,42 @@
 ﻿@model List<Styleza.Models.Wishlist>
+
 @{
     ViewData["Title"] = "My Wishlist";
 }
+
 <section class="section">
     <div class="container">
         <h2>My Wishlist</h2>
-        <div class="products-grid">
-            @foreach (var item in Model)
-            {
-                <div class="product-card">
-                    <img src="@item.Product.Images.FirstOrDefault(i => i.IsPrimary)?.ImageUrl" alt="@item.Product.Name" />
-                    <h3>@item.Product.Name</h3>
-                    <p>$@item.Product.Price.ToString("F2")</p>
-                </div>
-            }
-        </div>
+
+        @if (Model == null || !Model.Any())
+        {
+            <p>Your wishlist is empty.</p>
+        }
+        else
+        {
+            <div class="products-grid">
+                @foreach (var item in Model)
+                {
+                    <div class="product-card">
+                        <img src="@item.Product?.Images?.FirstOrDefault(i => i.IsPrimary)?.ImageUrl ?? " /images/default.jpg""
+                             alt="@item.Product?.Name ?? " Product"" />
+
+                        <h3>@item.Product?.Name ?? "Unknown Product"</h3>
+                        <p>
+                            @if (item.Product != null)
+                            {
+                                @item.Product.Price.ToString("C2")
+                                // Currency format
+
+                            }
+                            else
+                            {
+                                <span>Price not available</span>
+                            }
+                        </p>
+                    </div>
+                }
+            </div>
+        }
     </div>
 </section>
