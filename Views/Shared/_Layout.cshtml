@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="~/css/header.css" />
     <link rel="stylesheet" href="~/css/footer.css" />
     <link rel="stylesheet" href="~/css/mini-cart.css" />
+    <link rel="stylesheet" href="~/css/notification.css" />
     <link rel="stylesheet" href="~/css/product-card.css" />
     @RenderSection("Styles", required: false)
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -156,7 +157,7 @@
                         <a asp-controller="Home" asp-action="Wishlist"><i class="far fa-heart"></i></a>
                     </div>
                     <div class="nav-icon cart-icon">
-                        <a asp-controller="Cart" asp-action="Index"><i class="fas fa-shopping-bag"></i></a>
+                        <a href="javascript:void(0);" onclick="showMiniCart(); return false;"><i class="fas fa-shopping-bag"></i></a>
                         @{
                             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                             var cartCount = userId != null ? DbContext.CartItems.Count(c => c.UserId == userId) : 0;
@@ -176,7 +177,7 @@
                         <a asp-controller="Home" asp-action="Wishlist"><i class="far fa-heart"></i></a>
                     </div>
                     <div class="nav-icon cart-icon">
-                        <a asp-controller="Cart" asp-action="Index"><i class="fas fa-shopping-bag"></i></a>
+                        <a href="javascript:void(0);" onclick="showMiniCart(); return false;"><i class="fas fa-shopping-bag"></i></a>
                         <span class="cart-count">0</span>
                     </div>
                     @* <div class="nav-icon">
@@ -279,6 +280,7 @@
 
     <!-- Scripts -->
     <script src="~/js/home.js"></script>
+    <script src="~/js/cart.js"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>
