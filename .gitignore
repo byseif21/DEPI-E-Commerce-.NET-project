@@ -12,7 +12,7 @@ appsettings.Development.json
 connectionstrings.json
 secrets.json
 appsettings.Development.json1
-appsettings.json1
+#appsettings.json1
 
 # dotenv files
 .env
