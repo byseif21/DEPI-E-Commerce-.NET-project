@@ -26,8 +26,14 @@ namespace Styleza.Controllers
             _roleManager = roleManager;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            // Get statistics for the admin dashboard
+            ViewBag.ProductCount = await _context.Products.CountAsync();
+            ViewBag.OrderCount = await _context.Orders.CountAsync();
+            ViewBag.UserCount = await _userManager.Users.CountAsync();
+            ViewBag.TotalRevenue = await _context.Orders.SumAsync(o => o.TotalAmount);
+            
             return View();
         }
 

@@ -3,20 +3,20 @@
     ViewData["Title"] = "Category Management";
 }
 
-<div class="container mt-4">
-    <h1 class="mb-4">Category Management</h1>
+<div class="container admin-dashboard">
+    <h1>Category Management</h1>
     <div class="d-flex justify-content-between mb-3">
-        <a asp-action="Index" class="btn btn-secondary">Back to Dashboard</a>
-        <a asp-action="CreateCategory" class="btn btn-success">Add New Category</a>
+        <a asp-action="Index" class="admin-btn admin-btn-secondary"><i class="fas fa-arrow-left me-2"></i>Back to Dashboard</a>
+        <a asp-action="CreateCategory" class="admin-btn admin-btn-success"><i class="fas fa-plus me-2"></i>Add New Category</a>
     </div>
     
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Categories</h5>
+    <div class="admin-table-container">
+        <div class="admin-card-header">
+            <i class="fas fa-tags me-2"></i> Categories
         </div>
-        <div class="card-body">
+        <div class="admin-card-body">
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="admin-table">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -47,10 +47,10 @@
                                     }
                                 </td>
                                 <td>
-                                    <a asp-action="EditCategory" asp-route-id="@category.Id" class="btn btn-sm btn-primary">Edit</a>
+                                    <a asp-action="EditCategory" asp-route-id="@category.Id" class="admin-btn admin-btn-primary admin-btn-sm"><i class="fas fa-edit me-1"></i>Edit</a>
                                     <form asp-action="DeleteCategory" method="post" style="display: inline;">
                                         <input type="hidden" name="id" value="@category.Id" />
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this category? This will also delete all associated products.');">Delete</button>
+                                        <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm" onclick="return confirm('Are you sure you want to delete this category? This will also delete all associated products.');"><i class="fas fa-trash-alt me-1"></i>Delete</button>
                                     </form>
                                 </td>
                             </tr>

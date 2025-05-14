@@ -2,46 +2,81 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<div class="container mt-4">
-    <h1 class="mb-4">Admin Dashboard</h1>
+<div class="container admin-dashboard">
+    <h1>Admin Dashboard</h1>
+    
+    <div class="admin-stats-container">
+        <div class="admin-stat-card">
+            <div class="admin-stat-title">Total Products</div>
+            <div class="admin-stat-value">@ViewBag.ProductCount</div>
+            <div class="admin-stat-icon"><i class="fas fa-tshirt"></i></div>
+        </div>
+        <div class="admin-stat-card">
+            <div class="admin-stat-title">Total Orders</div>
+            <div class="admin-stat-value">@ViewBag.OrderCount</div>
+            <div class="admin-stat-icon"><i class="fas fa-shopping-bag"></i></div>
+        </div>
+        <div class="admin-stat-card">
+            <div class="admin-stat-title">Total Users</div>
+            <div class="admin-stat-value">@ViewBag.UserCount</div>
+            <div class="admin-stat-icon"><i class="fas fa-users"></i></div>
+        </div>
+        <div class="admin-stat-card">
+            <div class="admin-stat-title">Total Revenue</div>
+            <div class="admin-stat-value">$@ViewBag.TotalRevenue</div>
+            <div class="admin-stat-icon"><i class="fas fa-dollar-sign"></i></div>
+        </div>
+    </div>
     
     <div class="row">
         <div class="col-md-3 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">User Management</h5>
-                    <p class="card-text">Manage user accounts and admin roles</p>
-                    <a asp-action="UserManagement" class="btn btn-primary">Manage Users</a>
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <i class="fas fa-users me-2"></i> Users
+                </div>
+                <div class="admin-card-body">
+                    <h5 class="admin-card-title">User Management</h5>
+                    <p class="admin-card-text">Manage user accounts and admin roles</p>
+                    <a asp-action="UserManagement" class="admin-btn admin-btn-primary">Manage Users</a>
                 </div>
             </div>
         </div>
         
         <div class="col-md-3 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Product Management</h5>
-                    <p class="card-text">Add, edit, and remove products</p>
-                    <a asp-action="ProductManagement" class="btn btn-primary">Manage Products</a>
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <i class="fas fa-tshirt me-2"></i> Products
+                </div>
+                <div class="admin-card-body">
+                    <h5 class="admin-card-title">Product Management</h5>
+                    <p class="admin-card-text">Add, edit, and remove products</p>
+                    <a asp-action="ProductManagement" class="admin-btn admin-btn-primary">Manage Products</a>
                 </div>
             </div>
         </div>
         
         <div class="col-md-3 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Order Management</h5>
-                    <p class="card-text">View and process customer orders</p>
-                    <a asp-action="OrderManagement" class="btn btn-primary">Manage Orders</a>
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <i class="fas fa-shopping-cart me-2"></i> Orders
+                </div>
+                <div class="admin-card-body">
+                    <h5 class="admin-card-title">Order Management</h5>
+                    <p class="admin-card-text">View and process customer orders</p>
+                    <a asp-action="OrderManagement" class="admin-btn admin-btn-primary">Manage Orders</a>
                 </div>
             </div>
         </div>
         
         <div class="col-md-3 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Category Management</h5>
-                    <p class="card-text">Manage product categories</p>
-                    <a asp-action="CategoryManagement" class="btn btn-primary">Manage Categories</a>
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <i class="fas fa-tags me-2"></i> Categories
+                </div>
+                <div class="admin-card-body">
+                    <h5 class="admin-card-title">Category Management</h5>
+                    <p class="admin-card-text">Manage product categories</p>
+                    <a asp-action="CategoryManagement" class="admin-btn admin-btn-primary">Manage Categories</a>
                 </div>
             </div>
         </div>

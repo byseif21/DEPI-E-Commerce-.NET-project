@@ -17,6 +17,10 @@
     <link rel="stylesheet" href="~/css/notification.css" />
     <link rel="stylesheet" href="~/css/product-card.css" />
     <link rel="stylesheet" href="~/css/loader.css" />
+    @if (User.IsInRole("Admin"))
+    {
+        <link rel="stylesheet" href="~/css/admin.css" />
+    }
     @RenderSection("Styles", required: false)
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -158,6 +162,12 @@
                     <div class="nav-icon">
                         <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"><i class="far fa-user"></i></a>
                     </div>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <div class="nav-icon">
+                            <a asp-controller="Admin" asp-action="Index" title="Admin Dashboard"><i class="fas fa-cog"></i></a>
+                        </div>
+                    }
                     <div class="nav-icon">
                         <a asp-controller="Home" asp-action="Wishlist"><i class="far fa-heart"></i></a>
                     </div>
@@ -249,12 +259,9 @@
                 </li>
                 @if (SignInManager.IsSignedIn(User))
                 {
-                    <li class="mobile-nav-item">
-                        <a asp-area="Identity" asp-page="/Account/Manage/Index" class="mobile-nav-link">Profile</a>
-                    </li>
-                    <li class="mobile-nav-item">
-                        <a asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" class="mobile-nav-link">Logout</a>
-                    </li>
+                    <a asp-area="Identity" asp-page="/Account/Manage/Index"><i class="far fa-user"></i> My Account</a>
+                    <a asp-controller="Home" asp-action="Wishlist"><i class="far fa-heart"></i> Wishlist</a>
+                    <a asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 }
                 else
                 {
