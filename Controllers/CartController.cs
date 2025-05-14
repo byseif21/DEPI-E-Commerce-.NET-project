@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Styleza.Data;
 using Styleza.Models;
-using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Styleza.Controllers
 {
@@ -41,6 +43,10 @@ namespace Styleza.Controllers
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId))
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = "Please login to add items to cart" });
+                }
                 return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Index", "Home") });
             }
 
@@ -66,6 +72,7 @@ namespace Styleza.Controllers
                 cartItem = new CartItem
                 {
                     CartId = cart.Id,
+                    UserId = userId,
                     ProductId = productId,
                     Quantity = quantity
                 };
@@ -73,6 +80,19 @@ namespace Styleza.Controllers
             }
 
             await _context.SaveChangesAsync();
+            
+            // If it's an AJAX request, return JSON result
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                var product = await _context.Products.FindAsync(productId);
+                return Json(new { 
+                    success = true, 
+                    message = product != null ? $"{product.Name} added to cart!" : "Product added to cart!",
+                    cartCount = await _context.CartItems.CountAsync(c => c.UserId == userId)
+                });
+            }
+            
+            // Otherwise redirect to home page
             return RedirectToAction("Index", "Home");
         }
 
@@ -86,6 +106,13 @@ namespace Styleza.Controllers
                 await _context.SaveChangesAsync();
             }
 
+            // If it's an AJAX request, return JSON result
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return Json(new { success = true });
+            }
+            
+            // Otherwise redirect to cart page
             return RedirectToAction(nameof(Index));
         }
 
@@ -100,6 +127,48 @@ namespace Styleza.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCartItems()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Json(new { items = new List<object>() });
+            }
+
+            var cartItems = await _context.CartItems
+                .Where(ci => ci.UserId == userId)
+                .Include(ci => ci.Product)
+                .Select(ci => new
+                {
+                    id = ci.Id,
+                    name = ci.Product.Name,
+                    price = ci.Product.Price,
+                    quantity = ci.Quantity,
+                    imageUrl = ci.Product.ImageUrl
+                })
+                .ToListAsync();
+
+            return Json(new { items = cartItems });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCartTotal()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Json(new { total = 0.0 });
+            }
+
+            var total = await _context.CartItems
+                .Where(ci => ci.UserId == userId)
+                .Include(ci => ci.Product)
+                .SumAsync(ci => ci.Quantity * ci.Product.Price);
+
+            return Json(new { total });
         }
     }
 }
