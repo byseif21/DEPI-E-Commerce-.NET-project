@@ -1,0 +1,55 @@
+@model List<Styleza.Controllers.UserRoleViewModel>
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">User Management</h1>
+    <a asp-action="Index" class="btn btn-secondary mb-3">Back to Dashboard</a>
+    
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Users</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Roles</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>@user.Email</td>
+                                <td>
+                                    @string.Join(", ", user.Roles)
+                                </td>
+                                <td>
+                                    @if (!user.Roles.Contains("Admin"))
+                                    {
+                                        <form asp-action="AssignAdminRole" method="post" style="display: inline;">
+                                            <input type="hidden" name="userId" value="@user.UserId" />
+                                            <button type="submit" class="btn btn-sm btn-success">Make Admin</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form asp-action="RemoveAdminRole" method="post" style="display: inline;">
+                                            <input type="hidden" name="userId" value="@user.UserId" />
+                                            <button type="submit" class="btn btn-sm btn-danger">Remove Admin</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

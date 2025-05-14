@@ -1,0 +1,77 @@
+@model Styleza.Models.Product
+@{
+    ViewData["Title"] = "Create Product";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">Create New Product</h1>
+    <a asp-action="ProductManagement" class="btn btn-secondary mb-3">Back to Products</a>
+    
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Product Details</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="CreateProduct" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Product Name</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Price" class="form-label">Price</label>
+                            <input asp-for="Price" class="form-control" type="number" step="0.01" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="CategoryId" class="form-label">Category</label>
+                            <select asp-for="CategoryId" class="form-select">
+                                <option value="">-- Select Category --</option>
+                                @foreach (var category in ViewBag.Categories)
+                                {
+                                    <option value="@category.Id">@category.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="ImageUrl" class="form-label">Image URL</label>
+                            <input asp-for="ImageUrl" class="form-control" />
+                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="StockQuantity" class="form-label">Stock Quantity</label>
+                            <input asp-for="StockQuantity" class="form-control" type="number" />
+                            <span asp-validation-for="StockQuantity" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary">Create Product</button>
+                    <a asp-action="ProductManagement" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
