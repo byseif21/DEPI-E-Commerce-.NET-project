@@ -156,29 +156,53 @@ namespace Styleza.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProduct(Product product)
         {
-            if (ModelState.IsValid)
+            // Check if the model is valid before proceeding
+            if (!ModelState.IsValid)
+            {
+                // If model is invalid, log validation errors
+                foreach (var modelState in ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        Console.WriteLine($"Validation error: {error.ErrorMessage}");
+                    }
+                }
+                
+                // Return to the form with validation errors
+                ViewBag.Categories = await _context.Categories.ToListAsync();
+                ViewBag.ErrorMessage = "Please correct the validation errors and try again.";
+                return View(product);
+            }
+
+            try
             {
                 // The ProductId field is redundant with Id but required by the model
                 // For new products, we'll generate a random value to ensure it's not 0
-                // After saving, the database will assign the correct Id value
                 product.ProductId = new Random().Next(1000, 999999);
                 
+                // Add the product to the context
                 _context.Products.Add(product);
                 
-                try
-                {
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(ProductManagement));
-                }
-                catch (Exception ex)
-                {
-                    // Log the exception
-                    Console.WriteLine(ex.Message);
-                    ModelState.AddModelError("", "Unable to save the product. Please try again.");
-                }
+                // Save changes to the database
+                await _context.SaveChangesAsync();
+                
+                // Redirect to product management page on success
+                return RedirectToAction(nameof(ProductManagement));
             }
-            ViewBag.Categories = await _context.Categories.ToListAsync();
-            return View(product);
+            catch (Exception ex)
+            {
+                // Log the exception details
+                Console.WriteLine($"Error saving product: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                
+                // Add error message to model state
+                ModelState.AddModelError("", $"Unable to save the product: {ex.Message}");
+                
+                // Return to the form with the error
+                ViewBag.Categories = await _context.Categories.ToListAsync();
+                ViewBag.ErrorMessage = "An error occurred while saving the product. Please try again.";
+                return View(product);
+            }
         }
 
         [HttpPost]
