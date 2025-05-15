@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Styleza.Data;
 using Styleza.Models;
 using Microsoft.AspNetCore.Authorization;
+using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
@@ -157,9 +158,24 @@ namespace Styleza.Controllers
         {
             if (ModelState.IsValid)
             {
+                // The ProductId field is redundant with Id but required by the model
+                // For new products, we'll generate a random value to ensure it's not 0
+                // After saving, the database will assign the correct Id value
+                product.ProductId = new Random().Next(1000, 999999);
+                
                 _context.Products.Add(product);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(ProductManagement));
+                
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ProductManagement));
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception
+                    Console.WriteLine(ex.Message);
+                    ModelState.AddModelError("", "Unable to save the product. Please try again.");
+                }
             }
             ViewBag.Categories = await _context.Categories.ToListAsync();
             return View(product);
