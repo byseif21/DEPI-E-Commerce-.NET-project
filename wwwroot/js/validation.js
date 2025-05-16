@@ -14,7 +14,22 @@ const StylezaValidation = {
         const form = document.querySelector(formSelector);
         if (!form) return;
         
+        // Check if ASP.NET validation is already present
+        const hasAspNetValidation = form.querySelector('[data-val="true"]') !== null;
+        
+        // If ASP.NET validation summary exists, hide it initially to prevent duplicate messages
+        const validationSummary = form.querySelector('[data-valmsg-summary="true"]');
+        if (validationSummary) {
+            validationSummary.style.display = 'none';
+        }
+        
         form.addEventListener('submit', function(e) {
+            // If ASP.NET validation is handling this form and we have validation summary,
+            // let ASP.NET handle it to avoid duplicates
+            if (hasAspNetValidation && validationSummary) {
+                return true;
+            }
+            
             const isValid = StylezaValidation.validateForm(form, rules);
             
             if (!isValid) {
@@ -39,11 +54,22 @@ const StylezaValidation = {
     validateForm: function(form, rules) {
         let isValid = true;
         
+        // Check if this form already has ASP.NET validation
+        const hasAspNetValidation = form.querySelector('[data-val="true"]') !== null;
+        const validationSummary = form.querySelector('.validation-summary-errors, [data-valmsg-summary="true"]');
+        
+        // If ASP.NET validation is already showing errors, don't duplicate them
+        if (hasAspNetValidation && validationSummary && validationSummary.querySelector('ul li')) {
+            // ASP.NET validation is already showing errors, so we'll let it handle validation
+            return false;
+        }
+        
         // Reset previous validation states
         const errorElements = form.querySelectorAll('.is-invalid');
         errorElements.forEach(el => el.classList.remove('is-invalid'));
         
-        const errorMessages = form.querySelectorAll('[data-valmsg-for]');
+        // Only clear our custom error messages, not ASP.NET ones
+        const errorMessages = form.querySelectorAll('[data-valmsg-for]:not([data-valmsg-replace])');
         errorMessages.forEach(el => {
             el.textContent = '';
             el.style.display = 'none';
@@ -55,6 +81,11 @@ const StylezaValidation = {
             const field = form.querySelector(`#${fieldName}`);
             
             if (!field) continue;
+            
+            // Skip fields that are already being validated by ASP.NET
+            if (hasAspNetValidation && field.getAttribute('data-val') === 'true') {
+                continue;
+            }
             
             const errorElement = form.querySelector(`[data-valmsg-for='${fieldName}']`);
             const value = field.value;
@@ -165,9 +196,26 @@ const StylezaValidation = {
     displayServerErrors: function(errors, form) {
         if (!errors || !form) return;
         
+        // Check if ASP.NET validation summary is already displaying errors
+        const validationSummary = form.querySelector('.validation-summary-errors, [data-valmsg-summary="true"]');
+        const modelOnlyValidation = form.querySelector('[data-valmsg-summary="true"][data-valmsg-for=""]');
+        
+        // If ASP.NET validation summary is already showing errors, don't duplicate them
+        if (validationSummary && validationSummary.querySelector('ul li') && !modelOnlyValidation) {
+            // Hide our validation summary to avoid duplicates
+            return;
+        }
+        
+        // Process each error
         for (const fieldName in errors) {
             const field = form.querySelector(`#${fieldName}`);
             const errorElement = form.querySelector(`[data-valmsg-for='${fieldName}']`);
+            
+            // Skip if ASP.NET validation is already handling this field
+            if (field && field.getAttribute('data-val') === 'true' && 
+                errorElement && errorElement.getAttribute('data-valmsg-replace') === 'true') {
+                continue;
+            }
             
             if (field && errorElement) {
                 field.classList.add('is-invalid');

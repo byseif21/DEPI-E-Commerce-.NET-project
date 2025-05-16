@@ -67,6 +67,24 @@ const StylezaErrorHandler = {
      * @param {HTMLElement} additionalContent - Optional additional content to append
      */
     showErrorInContainer: function(message, container, additionalContent) {
+        // Check if ASP.NET validation summary is already displaying errors
+        const validationSummary = container.querySelector('.validation-summary-errors, [data-valmsg-summary="true"]');
+        const modelOnlyValidation = container.querySelector('[data-valmsg-summary="true"][data-valmsg-for=""]');
+        
+        // If ASP.NET validation summary is already showing errors, don't duplicate them
+        if (validationSummary && validationSummary.querySelector('ul li') && !modelOnlyValidation) {
+            // ASP.NET validation is already showing errors, so we'll let it handle validation
+            return;
+        }
+        
+        // Check if this is a form with ASP.NET validation
+        if (container.tagName === 'FORM' && container.querySelector('[data-val="true"]')) {
+            // If the form has ASP.NET validation, check if there's already a validation summary
+            if (container.querySelector('.validation-summary-errors, div[data-valmsg-summary="true"]')) {
+                return; // Don't add another error message
+            }
+        }
+        
         // Create error alert
         const alertDiv = document.createElement('div');
         alertDiv.className = 'alert alert-danger mb-3';
@@ -87,7 +105,7 @@ const StylezaErrorHandler = {
         }
         
         // Clear previous errors and add the new one
-        const existingAlerts = container.querySelectorAll('.alert-danger');
+        const existingAlerts = container.querySelectorAll('.alert-danger:not(.validation-summary-errors):not([data-valmsg-summary="true"])');
         existingAlerts.forEach(alert => alert.remove());
         
         // Insert at the beginning of the container

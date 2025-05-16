@@ -1,4 +1,10 @@
-@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+@{
+    // Only show one type of error message to prevent duplicates
+    bool showViewBagError = !string.IsNullOrEmpty(ViewBag.ErrorMessage);
+    bool showModelStateError = ViewData.ModelState.ErrorCount > 0 && !showViewBagError;
+}
+
+@if (showViewBagError)
 {
     <div class="alert alert-danger mb-3">
         <i class="fas fa-exclamation-circle me-2"></i>@ViewBag.ErrorMessage
@@ -15,7 +21,7 @@
     </div>
 }
 
-@if (ViewData.ModelState.ErrorCount > 0)
+@if (showModelStateError)
 {
     <div class="alert alert-danger mb-3">
         <i class="fas fa-exclamation-circle me-2"></i>Please correct the following errors:
