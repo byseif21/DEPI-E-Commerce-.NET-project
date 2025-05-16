@@ -36,7 +36,8 @@ namespace Styleza.Models
         [Range(1, 10000, ErrorMessage = "Price must be greater than 0 and less than 10000")]
         public decimal Price { get; set; }
         
-        [Required(ErrorMessage = "Image URL is required")]
+        // Not required as we're now uploading images
+        [RegularExpression(@"^.*$", ErrorMessage = "Please enter a valid image URL")]
         public string ImageUrl { get; set; }
         public string Tags { get; set; }
         

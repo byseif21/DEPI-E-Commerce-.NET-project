@@ -4,10 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Styleza.Data;
 using Styleza.Models;
 using Microsoft.AspNetCore.Authorization;
-using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
+//using System;
+//using System.Threading.Tasks;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.IO;
+//using Microsoft.AspNetCore.Http;
 
 namespace Styleza.Controllers
 {
@@ -135,10 +137,86 @@ namespace Styleza.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditProduct(Product product)
+        public async Task<IActionResult> EditProduct(Product product, IFormFile ProductImage)
         {
             if (ModelState.IsValid)
             {
+                // Handle file upload if a new image is provided
+                if (ProductImage != null && ProductImage.Length > 0)
+                {
+                    // Validate file type
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                    var fileExtension = Path.GetExtension(ProductImage.FileName).ToLowerInvariant();
+                    string fileName = string.Empty; // Declare fileName outside the try block
+                    
+                    if (!allowedExtensions.Contains(fileExtension))
+                    {
+                        ModelState.AddModelError("ProductImage", "Only JPG, PNG, and GIF files are allowed.");
+                        ViewBag.Categories = await _context.Categories.ToListAsync();
+                        return View(product);
+                    }
+                    
+                    try
+                    {
+                        // Create a unique filename
+                        fileName = $"{Guid.NewGuid()}{fileExtension}";
+                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "asset", "img", "products", fileName);
+                        
+                        // Ensure directory exists
+                        var directory = Path.GetDirectoryName(filePath);
+                        if (!Directory.Exists(directory))
+                        {
+                            Directory.CreateDirectory(directory);
+                        }
+                        
+                        // Save the file
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await ProductImage.CopyToAsync(fileStream);
+                        }
+                        
+                        // Set the ImageUrl property to the relative path
+                        product.ImageUrl = $"/asset/img/products/{fileName}";
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log the error
+                        Console.WriteLine($"Error saving image: {ex.Message}");
+                        ModelState.AddModelError("ProductImage", $"Error saving image: {ex.Message}");
+                        ViewBag.Categories = await _context.Categories.ToListAsync();
+                        return View(product);
+                    }
+                    
+                    // Set the ImageUrl property to the relative path
+                    product.ImageUrl = $"/asset/img/products/{fileName}";
+                    
+                    // Create a ProductImage entry if it doesn't exist
+                    var existingProduct = await _context.Products
+                        .Include(p => p.Images)
+                        .FirstOrDefaultAsync(p => p.Id == product.Id);
+                    
+                    if (existingProduct != null)
+                    {
+                        // Update existing primary image or add a new one
+                        var primaryImage = existingProduct.Images.FirstOrDefault(i => i.IsPrimary);
+                        if (primaryImage != null)
+                        {
+                            primaryImage.ImageUrl = product.ImageUrl;
+                        }
+                        else
+                        {
+                            existingProduct.Images.Add(new ProductImage
+                            {
+                                ImageUrl = product.ImageUrl,
+                                ProductId = product.Id,
+                                IsPrimary = true
+                            });
+                        }
+                    }
+                }
+                // If no new image is uploaded, keep the existing image
+                // The product.ImageUrl will already contain the existing image URL from the form
+                
                 _context.Update(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(ProductManagement));
@@ -154,8 +232,14 @@ namespace Styleza.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProduct(Product product)
+        public async Task<IActionResult> CreateProduct(Product product, IFormFile ProductImage)
         {
+            // Ensure Images collection is initialized
+            if (product.Images == null)
+            {
+                product.Images = new List<ProductImage>();
+            }
+            
             // Check if the model is valid before proceeding
             if (!ModelState.IsValid)
             {
@@ -176,9 +260,115 @@ namespace Styleza.Controllers
 
             try
             {
+                // Handle color field - if it's not a hex color code, it might be a color name
+                if (!string.IsNullOrEmpty(product.Color) && !product.Color.StartsWith("#"))
+                {
+                    // Map common color names to hex values if needed
+                    // For now, we'll just accept the color name as is
+                    // This allows users to enter "White" instead of "#FFFFFF"
+                }
+                
+                // Handle file upload
+                if (ProductImage != null && ProductImage.Length > 0)
+                {
+                    // Validate file type
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                    var fileExtension = Path.GetExtension(ProductImage.FileName).ToLowerInvariant();
+                    string fileName = string.Empty; // Declare fileName outside the try block
+                    
+                    if (!allowedExtensions.Contains(fileExtension))
+                    {
+                        ModelState.AddModelError("ProductImage", "Only JPG, PNG, and GIF files are allowed.");
+                        ViewBag.Categories = await _context.Categories.ToListAsync();
+                        return View(product);
+                    }
+                    
+                    try
+                    {
+                        // Create a unique filename
+                        fileName = $"{Guid.NewGuid()}{fileExtension}";
+                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "asset", "img", "products", fileName);
+                        
+                        // Ensure directory exists
+                        var directory = Path.GetDirectoryName(filePath);
+                        if (!Directory.Exists(directory))
+                        {
+                            Directory.CreateDirectory(directory);
+                        }
+                        
+                        // Save the file
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await ProductImage.CopyToAsync(fileStream);
+                        }
+                        
+                        // Set the ImageUrl property to the relative path
+                        product.ImageUrl = $"/asset/img/products/{fileName}";
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log the error
+                        Console.WriteLine($"Error saving image: {ex.Message}");
+                        ModelState.AddModelError("ProductImage", $"Error saving image: {ex.Message}");
+                        ViewBag.Categories = await _context.Categories.ToListAsync();
+                        return View(product);
+                    }
+                    
+                    // Create a ProductImage entry
+                    var productImage = new ProductImage
+                    {
+                        ImageUrl = product.ImageUrl,
+                        IsPrimary = true
+                    };
+                    
+                    product.Images.Add(productImage);
+                }
+                else if (string.IsNullOrEmpty(product.ImageUrl) || product.ImageUrl == "/asset/img/products/placeholder.jpg")
+                {
+                    // If no image is uploaded and no custom ImageUrl is provided, use a placeholder
+                    product.ImageUrl = "/asset/img/products/placeholder.jpg";
+                    
+                    // Create a ProductImage entry for the placeholder
+                    var productImage = new ProductImage
+                    {
+                        ImageUrl = product.ImageUrl,
+                        IsPrimary = true
+                    };
+                    
+                    product.Images.Add(productImage);
+                }
+                
                 // The ProductId field is redundant with Id but required by the model
                 // For new products, we'll generate a random value to ensure it's not 0
                 product.ProductId = new Random().Next(1000, 999999);
+                
+                // Ensure required fields are set
+                if (string.IsNullOrEmpty(product.Name))
+                {
+                    ModelState.AddModelError("Name", "Product name is required");
+                }
+                
+                if (string.IsNullOrEmpty(product.Description))
+                {
+                    ModelState.AddModelError("Description", "Description is required");
+                }
+                
+                if (product.Price <= 0)
+                {
+                    ModelState.AddModelError("Price", "Price must be greater than 0");
+                }
+                
+                if (product.CategoryId <= 0)
+                {
+                    ModelState.AddModelError("CategoryId", "Please select a category");
+                }
+                
+                // Check if there are any validation errors
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.Categories = await _context.Categories.ToListAsync();
+                    return View(product);
+                }
                 
                 // Add the product to the context
                 _context.Products.Add(product);

@@ -12,7 +12,7 @@
             <i class="fas fa-tshirt me-2"></i>Product Details
         </div>
         <div class="admin-card-body">
-            <form asp-action="CreateProduct" method="post">
+            <form asp-action="CreateProduct" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
                 {
@@ -78,8 +78,10 @@
                         </div>
                         
                         <div class="admin-form-group">
-                            <label asp-for="ImageUrl" class="admin-form-label">Image URL</label>
-                            <input asp-for="ImageUrl" class="admin-form-control" />
+                            <label class="admin-form-label">Product Image</label>
+                            <input type="file" name="ProductImage" class="admin-form-control" accept="image/*" />
+                            <small class="form-text text-muted">Upload a product image (JPG, PNG, or GIF). Maximum size: 5MB.</small>
+                            <input asp-for="ImageUrl" type="hidden" value="/asset/img/products/placeholder.jpg" />
                             <span asp-validation-for="ImageUrl" class="text-danger"></span>
                         </div>
                         

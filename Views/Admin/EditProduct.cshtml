@@ -12,7 +12,7 @@
             <i class="fas fa-edit me-2"></i>Product Details
         </div>
         <div class="admin-card-body">
-            <form asp-action="EditProduct" method="post">
+            <form asp-action="EditProduct" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
                 
@@ -51,8 +51,13 @@
                         </div>
                         
                         <div class="admin-form-group">
-                            <label asp-for="ImageUrl" class="admin-form-label">Image URL</label>
-                            <input asp-for="ImageUrl" class="admin-form-control" />
+                            <label class="admin-form-label">Product Image</label>
+                            <div class="mb-2">
+                                <img src="@Model.ImageUrl" alt="@Model.Name" style="max-width: 100px; max-height: 100px;" class="img-thumbnail" />
+                            </div>
+                            <input type="file" name="ProductImage" class="admin-form-control" accept="image/*" />
+                            <small class="form-text text-muted">Upload a new image to replace the current one (JPG, PNG, or GIF). Maximum size: 5MB.</small>
+                            <input asp-for="ImageUrl" type="hidden" value="@Model.ImageUrl" />
                             <span asp-validation-for="ImageUrl" class="text-danger"></span>
                         </div>
                         
