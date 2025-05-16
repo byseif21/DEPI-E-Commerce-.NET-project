@@ -15,6 +15,7 @@
             <form asp-action="EditCategory" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
+                <partial name="_ErrorMessagePartial" />
                 
                 <div class="admin-form-group">
                     <label asp-for="Name" class="admin-form-label">Category Name</label>
@@ -45,4 +46,5 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="/js/validation.js"></script>
 }
