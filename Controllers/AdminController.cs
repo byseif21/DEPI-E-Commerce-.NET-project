@@ -228,7 +228,15 @@ namespace Styleza.Controllers
         public IActionResult CreateProduct()
         {
             ViewBag.Categories = _context.Categories.ToList();
-            return View();
+            // Initialize a new Product with default values
+            var product = new Product
+            {
+                IsInStock = true,
+                StockQuantity = 1,
+                Images = new List<ProductImage>(),
+                ProductId = new Random().Next(1000, 999999) // Pre-generate ProductId
+            };
+            return View(product);
         }
 
         [HttpPost]
@@ -240,20 +248,44 @@ namespace Styleza.Controllers
                 product.Images = new List<ProductImage>();
             }
             
+            // The ProductId field is redundant with Id but required by the model
+            // For new products, we'll generate a random value to ensure it's not 0
+            // This is important as the ProductId must be unique
+            product.ProductId = new Random().Next(1000, 999999);
+            
+            // Ensure we're creating a new product (Id should be 0)
+            product.Id = 0;
+            
+            // Log all model state errors to help with debugging
+            Console.WriteLine("Model State Validation Status: " + ModelState.IsValid);
+            foreach (var key in ModelState.Keys)
+            {
+                var state = ModelState[key];
+                if (state.Errors.Count > 0)
+                {
+                    Console.WriteLine($"Field: {key} has the following errors:");
+                    foreach (var error in state.Errors)
+                    {
+                        Console.WriteLine($"  - {error.ErrorMessage}");
+                    }
+                }
+            }
+            
+            // Explicitly check if CategoryId is valid
+            if (product.CategoryId <= 0)
+            {
+                ModelState.AddModelError("CategoryId", "Please select a valid category");
+            }
+            
             // Check if the model is valid before proceeding
             if (!ModelState.IsValid)
             {
-                // If model is invalid, log validation errors
-                foreach (var modelState in ModelState.Values)
-                {
-                    foreach (var error in modelState.Errors)
-                    {
-                        Console.WriteLine($"Validation error: {error.ErrorMessage}");
-                    }
-                }
-                
                 // Return to the form with validation errors
                 ViewBag.Categories = await _context.Categories.ToListAsync();
+                ViewBag.ValidationErrors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
                 ViewBag.ErrorMessage = "Please correct the validation errors and try again.";
                 return View(product);
             }
@@ -318,7 +350,9 @@ namespace Styleza.Controllers
                     var productImage = new ProductImage
                     {
                         ImageUrl = product.ImageUrl,
-                        IsPrimary = true
+                        IsPrimary = true,
+                        // We can't set ProductId yet as the product hasn't been saved
+                        // The relationship will be managed by EF Core when saving
                     };
                     
                     product.Images.Add(productImage);
@@ -333,31 +367,43 @@ namespace Styleza.Controllers
                     {
                         ImageUrl = product.ImageUrl,
                         IsPrimary = true
+                        // ProductId will be set automatically by EF Core when the product is saved
                     };
                     
                     product.Images.Add(productImage);
                 }
                 
-                // The ProductId field is redundant with Id but required by the model
-                // For new products, we'll generate a random value to ensure it's not 0
-                product.ProductId = new Random().Next(1000, 999999);
+                // We don't need to check these fields manually as they're already validated by data annotations
+                // in the Product model. The ModelState.IsValid check above will catch these issues.
                 
-                // Ensure required fields are set
-                if (string.IsNullOrEmpty(product.Name))
+                try
                 {
-                    ModelState.AddModelError("Name", "Product name is required");
-                }
-                
-                if (string.IsNullOrEmpty(product.Description))
-                {
-                    ModelState.AddModelError("Description", "Description is required");
-                }
-                
-                if (product.Price <= 0)
-                {
-                    ModelState.AddModelError("Price", "Price must be greater than 0");
-                }
-                
+                    // Ensure the product has a valid category
+                    var category = await _context.Categories.FindAsync(product.CategoryId);
+                    if (category == null)
+                    {
+                        ModelState.AddModelError("CategoryId", "Selected category does not exist");
+                        ViewBag.Categories = await _context.Categories.ToListAsync();
+                        ViewBag.ErrorMessage = "Please select a valid category";
+                        return View(product);
+                    }
+
+                    // Ensure required fields are set
+                    if (string.IsNullOrEmpty(product.Name))
+                    {
+                        ModelState.AddModelError("Name", "Product name is required");
+                    }
+                    
+                    if (string.IsNullOrEmpty(product.Description))
+                    {
+                        ModelState.AddModelError("Description", "Description is required");
+                    }
+                    
+                    if (product.Price <= 0)
+                    {
+                        ModelState.AddModelError("Price", "Price must be greater than 0");
+                    }
+                    
                 if (product.CategoryId <= 0)
                 {
                     ModelState.AddModelError("CategoryId", "Please select a category");
@@ -365,19 +411,39 @@ namespace Styleza.Controllers
                 
                 // Check if there are any validation errors
                 if (!ModelState.IsValid)
+                    {
+                        ViewBag.Categories = await _context.Categories.ToListAsync();
+                        ViewBag.ValidationErrors = ModelState.Values
+                            .SelectMany(v => v.Errors)
+                            .Select(e => e.ErrorMessage)
+                            .ToList();
+                        ViewBag.ErrorMessage = "Please correct the validation errors and try again.";
+                        return View(product);
+                    }
+                    
+                    // Add the product to the context
+                    _context.Products.Add(product);
+                    
+                    // Save changes to the database
+                    await _context.SaveChangesAsync();
+                    
+                    // Redirect to product management page on success
+                    return RedirectToAction(nameof(ProductManagement));
+                }
+                catch (Exception ex)
                 {
+                    // Log the error
+                    Console.WriteLine($"Error saving product to database: {ex.Message}");
+                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                    
+                    // Add error message to model state
+                    ModelState.AddModelError("", $"Database error: {ex.Message}");
+                    
+                    // Return to the form with the error
                     ViewBag.Categories = await _context.Categories.ToListAsync();
+                    ViewBag.ErrorMessage = "A database error occurred while saving the product. Please try again.";
                     return View(product);
                 }
-                
-                // Add the product to the context
-                _context.Products.Add(product);
-                
-                // Save changes to the database
-                await _context.SaveChangesAsync();
-                
-                // Redirect to product management page on success
-                return RedirectToAction(nameof(ProductManagement));
             }
             catch (Exception ex)
             {

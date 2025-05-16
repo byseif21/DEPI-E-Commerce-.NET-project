@@ -37,7 +37,6 @@ namespace Styleza.Models
         public decimal Price { get; set; }
         
         // Not required as we're now uploading images
-        [RegularExpression(@"^.*$", ErrorMessage = "Please enter a valid image URL")]
         public string ImageUrl { get; set; }
         public string Tags { get; set; }
         
