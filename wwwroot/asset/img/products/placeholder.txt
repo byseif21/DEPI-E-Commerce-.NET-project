@@ -1,0 +1,1 @@
+This directory is for storing product images uploaded through the admin panel.

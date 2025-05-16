@@ -1,0 +1,85 @@
+@model List<Styleza.Models.Order>
+@{
+    ViewData["Title"] = "Order Management";
+}
+
+<div class="container admin-dashboard">
+    <h1>Order Management</h1>
+    <a asp-action="Index" class="admin-btn admin-btn-secondary mb-3"><i class="fas fa-arrow-left me-2"></i>Back to Dashboard</a>
+    
+    <div class="admin-table-container">
+        <div class="admin-card-header">
+            <i class="fas fa-shopping-cart me-2"></i> Orders
+        </div>
+        <div class="admin-card-body">
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model)
+                        {
+                            <tr>
+                                <td>@order.Id</td>
+                                <td>@order.OrderDate.ToString("MM/dd/yyyy")</td>
+                                <td>@order.CustomerName</td>
+                                <td>$@order.TotalAmount.ToString("F2")</td>
+                                <td>
+                                    <span class="admin-btn @(order.Status == "Completed" ? "admin-btn-success" : 
+                                                      order.Status == "Processing" ? "admin-btn-primary" : 
+                                                      order.Status == "Shipped" ? "admin-btn-info" : "admin-btn-warning") admin-btn-sm" style="cursor: default;">@order.Status</span>
+                                </td>
+                                <td>
+                                    <a asp-action="OrderDetails" asp-route-id="@order.Id" class="admin-btn admin-btn-primary admin-btn-sm"><i class="fas fa-eye me-1"></i>Details</a>
+                                    <div class="dropdown d-inline-block">
+                                        <button class="admin-btn admin-btn-secondary admin-btn-sm dropdown-toggle" type="button" id="dropdownMenuButton@(order.Id)" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-edit me-1"></i>Update Status
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton@(order.Id)">
+                                            <li>
+                                                <form asp-action="UpdateOrderStatus" method="post">
+                                                    <input type="hidden" name="id" value="@order.Id" />
+                                                    <input type="hidden" name="status" value="Processing" />
+                                                    <button type="submit" class="dropdown-item">Processing</button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form asp-action="UpdateOrderStatus" method="post">
+                                                    <input type="hidden" name="id" value="@order.Id" />
+                                                    <input type="hidden" name="status" value="Shipped" />
+                                                    <button type="submit" class="dropdown-item">Shipped</button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form asp-action="UpdateOrderStatus" method="post">
+                                                    <input type="hidden" name="id" value="@order.Id" />
+                                                    <input type="hidden" name="status" value="Completed" />
+                                                    <button type="submit" class="dropdown-item">Completed</button>
+                                                </form>
+                                            </li>
+                                            <li>
+                                                <form asp-action="UpdateOrderStatus" method="post">
+                                                    <input type="hidden" name="id" value="@order.Id" />
+                                                    <input type="hidden" name="status" value="Cancelled" />
+                                                    <button type="submit" class="dropdown-item">Cancelled</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,280 @@
+:root {
+    --admin-primary: #2a2d45;
+    --admin-secondary: #f27d42;
+    --admin-accent: #6c63ff;
+    --admin-light: #f5f5f7;
+    --admin-dark: #1a1a1a;
+    --admin-success: #4caf50;
+    --admin-danger: #f44336;
+    --admin-warning: #ff9800;
+    --admin-info: #2196f3;
+    --admin-gray: #e0e0e0;
+    --admin-border: #ddd;
+}
+
+/* Admin Dashboard Styles */
+.admin-dashboard {
+    padding: 2rem 0;
+}
+
+.admin-dashboard h1 {
+    font-family: var(--font-secondary);
+    color: var(--admin-primary);
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.admin-dashboard h1:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background-color: var(--admin-secondary);
+}
+
+/* Admin Cards */
+.admin-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    height: 100%;
+    border: none;
+    overflow: hidden;
+}
+
+.admin-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.admin-card-header {
+    background-color: var(--admin-primary);
+    color: white;
+    padding: 1rem;
+    font-family: var(--font-secondary);
+}
+
+.admin-card-body {
+    padding: 1.5rem;
+}
+
+.admin-card-title {
+    font-family: var(--font-secondary);
+    color: var(--admin-primary);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.admin-card-text {
+    color: #666;
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+}
+
+/* Admin Buttons */
+.admin-btn {
+    display: inline-block;
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    font-family: var(--font-primary);
+}
+
+.admin-btn-primary {
+    background-color: var(--admin-primary);
+    color: white;
+}
+
+.admin-btn-primary:hover {
+    background-color: #3a3d55;
+    color: white;
+}
+
+.admin-btn-secondary {
+    background-color: var(--admin-secondary);
+    color: white;
+}
+
+.admin-btn-secondary:hover {
+    background-color: #e06a30;
+    color: white;
+}
+
+.admin-btn-success {
+    background-color: var(--admin-success);
+    color: white;
+}
+
+.admin-btn-success:hover {
+    background-color: #3d9c40;
+}
+
+.admin-btn-danger {
+    background-color: var(--admin-danger);
+    color: white;
+}
+
+.admin-btn-danger:hover {
+    background-color: #d32f2f;
+}
+
+.admin-btn-sm {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+/* Admin Tables */
+.admin-table-container {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th {
+    background-color: var(--admin-primary);
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 500;
+}
+
+.admin-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-table tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-table tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.admin-table tr:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Admin Forms */
+.admin-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.admin-form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--admin-primary);
+}
+
+.admin-form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--admin-border);
+    border-radius: var(--border-radius);
+    font-family: var(--font-primary);
+    transition: var(--transition);
+}
+
+.admin-form-control:focus {
+    border-color: var(--admin-accent);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+}
+
+/* Admin Stats */
+.admin-stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.admin-stat-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-stat-title {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.admin-stat-value {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--admin-primary);
+    margin-bottom: 0.5rem;
+}
+
+.admin-stat-icon {
+    align-self: flex-end;
+    font-size: 2.5rem;
+    color: rgba(0, 0, 0, 0.1);
+    margin-top: -2.5rem;
+}
+
+/* Admin Pagination */
+.admin-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.admin-pagination-item {
+    margin: 0 0.25rem;
+}
+
+.admin-pagination-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: white;
+    color: var(--admin-primary);
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+}
+
+.admin-pagination-link:hover,
+.admin-pagination-link.active {
+    background-color: var(--admin-primary);
+    color: white;
+}
+
+/* Responsive Admin Layout */
+@media (max-width: 768px) {
+    .admin-stats-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .admin-table-container {
+        overflow-x: auto;
+    }
+    
+    .admin-table {
+        min-width: 600px;
+    }
+}

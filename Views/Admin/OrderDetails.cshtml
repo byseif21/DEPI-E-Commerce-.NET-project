@@ -1,0 +1,135 @@
+@model Styleza.Models.Order
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<div class="container admin-dashboard">
+    <h1>Order Details</h1>
+    <a asp-action="OrderManagement" class="admin-btn admin-btn-secondary admin-mb-3"><i class="fas fa-arrow-left me-2"></i>Back to Orders</a>
+    
+    <div class="admin-row">
+        <div class="admin-col-6">
+            <div class="admin-table-container admin-mb-4">
+                <div class="admin-card-header">
+                    <i class="fas fa-info-circle me-2"></i>Order Information
+                </div>
+                <div class="admin-card-body">
+                    <dl class="admin-row">
+                        <dt class="admin-col-4">Order ID:</dt>
+                        <dd class="admin-col-8">@Model.Id</dd>
+                        
+                        <dt class="admin-col-4">Order Date:</dt>
+                        <dd class="admin-col-8">@Model.OrderDate.ToString("MM/dd/yyyy HH:mm")</dd>
+                        
+                        <dt class="admin-col-4">Status:</dt>
+                        <dd class="admin-col-8">
+                            <span class="admin-badge @(Model.Status == "Completed" ? "admin-badge-success" : 
+                                              Model.Status == "Processing" ? "admin-badge-primary" : 
+                                              Model.Status == "Shipped" ? "admin-badge-info" : "admin-badge-warning")">@Model.Status</span>
+                        </dd>
+                        
+                        <dt class="admin-col-4">Total Amount:</dt>
+                        <dd class="admin-col-8">$@Model.TotalAmount.ToString("F2")</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        
+        <div class="admin-col-6">
+            <div class="admin-table-container admin-mb-4">
+                <div class="admin-card-header">
+                    <i class="fas fa-user me-2"></i>Customer Information
+                </div>
+                <div class="admin-card-body">
+                    <dl class="admin-row">
+                        <dt class="admin-col-4">Name:</dt>
+                        <dd class="admin-col-8">@Model.CustomerName</dd>
+                        
+                        <dt class="admin-col-4">Email:</dt>
+                        <dd class="admin-col-8">@Model.CustomerEmail</dd>
+                        
+                        <dt class="admin-col-4">Phone:</dt>
+                        <dd class="admin-col-8">@Model.CustomerPhone</dd>
+                        
+                        <dt class="admin-col-4">Address:</dt>
+                        <dd class="admin-col-8">
+                            @Model.ShippingAddress<br />
+                            @Model.ShippingCity, @Model.ShippingState @Model.ShippingZipCode<br />
+                            @Model.ShippingCountry
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="admin-table-container">
+        <div class="admin-card-header">
+            <i class="fas fa-shopping-basket me-2"></i>Order Items
+        </div>
+        <div class="admin-card-body">
+            <div class="admin-table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="admin-flex admin-align-center">
+                                        @if (!string.IsNullOrEmpty(item.Product?.ImageUrl))
+                                        {
+                                            <img src="@item.Product.ImageUrl" alt="@item.Product.Name" class="admin-product-thumbnail" />
+                                        }
+                                        <span>@item.Product?.Name</span>
+                                    </div>
+                                </td>
+                                <td>$@item.Price.ToString("F2")</td>
+                                <td>@item.Quantity</td>
+                                <td>$@((item.Price * item.Quantity).ToString("F2"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3" class="admin-text-end">Total:</th>
+                            <th>$@Model.TotalAmount.ToString("F2")</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="admin-table-container admin-mt-4">
+        <div class="admin-card-header">
+            <i class="fas fa-exchange-alt me-2"></i>Update Order Status
+        </div>
+        <div class="admin-card-body">
+            <div class="admin-row">
+                <div class="admin-col-6">
+                    <form asp-action="UpdateOrderStatus" method="post" class="admin-form">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <div class="admin-form-group">
+                            <label for="status" class="admin-form-label">Status</label>
+                            <select name="status" id="status" class="admin-form-select">
+                                <option value="Processing" selected="@(Model.Status == "Processing")">Processing</option>
+                                <option value="Shipped" selected="@(Model.Status == "Shipped")">Shipped</option>
+                                <option value="Completed" selected="@(Model.Status == "Completed")">Completed</option>
+                                <option value="Cancelled" selected="@(Model.Status == "Cancelled")">Cancelled</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="admin-btn admin-btn-primary"><i class="fas fa-sync-alt me-2"></i>Update Status</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
