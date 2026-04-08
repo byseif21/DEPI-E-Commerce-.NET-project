@@ -1,17 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Get cart icon elements
-    const cartIcons = document.querySelectorAll('.cart-icon a');
+    // Cart icon click handlers are handled by onclick in HTML to avoid duplication
     
-    // Add click event to cart icons
-    cartIcons.forEach(icon => {
-        icon.addEventListener('click', function(e) {
-            e.preventDefault(); // Prevent navigation to cart page
-            showMiniCart();
-        });
-    });
-    
-    // Show mini cart function
-    function showMiniCart() {
+    // Expose showMiniCart to window so it can be called from onclick handlers
+    window.showMiniCart = function() {
         // If mini-cart already exists, don't create another one
         if (document.querySelector('.mini-cart')) return;
         

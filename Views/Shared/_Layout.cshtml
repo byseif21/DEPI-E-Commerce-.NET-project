@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @using Styleza.Data
 @using Styleza.Models
 @inject SignInManager<IdentityUser> SignInManager
@@ -50,7 +50,7 @@
                                 <div class="dropdown-column">
                                     <h3 class="dropdown-title">Women</h3>
                                     <ul class="dropdown-links">
-                                        @foreach (var category in DbContext.Categories.Where(c => c.Name.Contains("Women") || c.SubCategories.Any(sc => sc.Name.Contains("Women"))).Take(5))
+                                        @foreach (var category in DbContext.Categories.Where(c => c.Name.Contains("Women") || c.SubCategories.Any(sc => sc.Name.Contains("Women"))).Take(5).ToList())
                                         {
                                             <li><a asp-controller="Products" asp-action="Shop" asp-route-category="@category.Name.ToLower()">@category.Name</a></li>
                                         }
@@ -59,7 +59,7 @@
                                 <div class="dropdown-column">
                                     <h3 class="dropdown-title">Men</h3>
                                     <ul class="dropdown-links">
-                                        @foreach (var category in DbContext.Categories.Where(c => c.Name.Contains("Men") || c.SubCategories.Any(sc => sc.Name.Contains("Men"))).Take(5))
+                                        @foreach (var category in DbContext.Categories.Where(c => c.Name.Contains("Men") || c.SubCategories.Any(sc => sc.Name.Contains("Men"))).Take(5).ToList())
                                         {
                                             <li><a asp-controller="Products" asp-action="Shop" asp-route-category="@category.Name.ToLower()">@category.Name</a></li>
                                         }
@@ -222,12 +222,12 @@
                     </div>
                     <ul class="mobile-submenu">
                         <li><h3>Women</h3></li>
-                        @foreach (var category in DbContext.Categories.Where(c => c.Name.Contains("Women") || c.SubCategories.Any(sc => sc.Name.Contains("Women"))).Take(5))
+                        @foreach (var category in DbContext.Categories.Where(c => c.Name.Contains("Women") || c.SubCategories.Any(sc => sc.Name.Contains("Women"))).Take(5).ToList())
                         {
                             <li><a asp-controller="Products" asp-action="Shop" asp-route-category="@category.Name.ToLower()">@category.Name</a></li>
                         }
                         <li><h3>Men</h3></li>
-                        @foreach (var category in DbContext.Categories.Where(c => c.Name.Contains("Men") || c.SubCategories.Any(sc => sc.Name.Contains("Men"))).Take(5))
+                        @foreach (var category in DbContext.Categories.Where(c => c.Name.Contains("Men") || c.SubCategories.Any(sc => sc.Name.Contains("Men"))).Take(5).ToList())
                         {
                             <li><a asp-controller="Products" asp-action="Shop" asp-route-category="@category.Name.ToLower()">@category.Name</a></li>
                         }
@@ -291,12 +291,24 @@
     <partial name="_Footer" />
 
     <!-- Scripts -->
+    <script src="~/js/loader.js"></script>
     <script src="~/js/home.js" asp-append-version="true"></script>
     <script src="~/js/cart.js"></script>
-    <script src="~/js/loader.js"></script>
     <script src="~/js/wishlist.js" asp-append-version="true"></script>
     <script src="~/js/error-handler.js"></script>
 
     @RenderSection("Scripts", required: false)
+
+    <!-- Emergency Loader Hide (Failsafe) -->
+    <script>
+        setTimeout(function() {
+            var l = document.querySelector('.styleza-loader-container');
+            if (l && !l.classList.contains('hidden')) {
+                console.warn('[Styleza] Emergency loader hide triggered');
+                l.classList.add('hidden');
+                setTimeout(function() { l.style.display = 'none'; }, 300);
+            }
+        }, 2000);
+    </script>
 </body>
 </html>

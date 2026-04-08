@@ -40,59 +40,79 @@ namespace Styleza.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToCart(int productId, int quantity = 1)
         {
-            var userId = _userManager.GetUserId(User);
-            if (string.IsNullOrEmpty(userId))
+            try
             {
+                var userId = _userManager.GetUserId(User);
+                if (string.IsNullOrEmpty(userId))
+                {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = "Please login to add items to cart" });
+                    }
+                    return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Index", "Home") });
+                }
+
+                // Get or create cart
+                var cart = await _context.Carts.FirstOrDefaultAsync(c => c.UserId == userId);
+                if (cart == null)
+                {
+                    cart = new Cart { UserId = userId };
+                    _context.Carts.Add(cart);
+                    await _context.SaveChangesAsync();
+                }
+
+                // Check if product already in cart
+                var cartItem = await _context.CartItems.FirstOrDefaultAsync(ci => ci.CartId == cart.Id && ci.ProductId == productId);
+                if (cartItem != null)
+                {
+                    // Update quantity
+                    cartItem.Quantity += quantity;
+                    cartItem.UserId = userId; // Ensure UserId is set during update too
+                }
+                else
+                {
+                    // Add new item
+                    cartItem = new CartItem
+                    {
+                        CartId = cart.Id,
+                        ProductId = productId,
+                        Quantity = quantity,
+                        UserId = userId // CRITICAL: This was the missing field causing the DB error!
+                    };
+                    _context.CartItems.Add(cartItem);
+                }
+
+                await _context.SaveChangesAsync();
+                
+                // If it's an AJAX request, return JSON result
                 if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 {
-                    return Json(new { success = false, message = "Please login to add items to cart" });
+                    var product = await _context.Products.FindAsync(productId);
+                    var count = await _context.CartItems
+                        .Where(ci => ci.CartId == cart.Id)
+                        .SumAsync(ci => ci.Quantity);
+
+                    return Json(new { 
+                        success = true, 
+                        message = product != null ? $"{product.Name} added to cart!" : "Product added to cart!",
+                        cartCount = count
+                    });
                 }
-                return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Index", "Home") });
+                
+                // Otherwise redirect to home page
+                return RedirectToAction("Index", "Home");
             }
+            catch (Exception ex)
+            {
+                var fullError = ex.Message + (ex.InnerException != null ? " | Inner: " + ex.InnerException.Message : "");
+                Console.WriteLine($"[Cart Error] {fullError}");
 
-            // Get or create cart
-            var cart = await _context.Carts.FirstOrDefaultAsync(c => c.UserId == userId);
-            if (cart == null)
-            {
-                cart = new Cart { UserId = userId };
-                _context.Carts.Add(cart);
-                await _context.SaveChangesAsync();
-            }
-
-            // Check if product already in cart
-            var cartItem = await _context.CartItems.FirstOrDefaultAsync(ci => ci.CartId == cart.Id && ci.ProductId == productId);
-            if (cartItem != null)
-            {
-                // Update quantity
-                cartItem.Quantity += quantity;
-            }
-            else
-            {
-                // Add new item
-                cartItem = new CartItem
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 {
-                    CartId = cart.Id,
-                    ProductId = productId,
-                    Quantity = quantity
-                };
-                _context.CartItems.Add(cartItem);
+                    return Json(new { success = false, message = "Database Error: " + fullError });
+                }
+                throw;
             }
-
-            await _context.SaveChangesAsync();
-            
-            // If it's an AJAX request, return JSON result
-            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-            {
-                var product = await _context.Products.FindAsync(productId);
-                return Json(new { 
-                    success = true, 
-                    message = product != null ? $"{product.Name} added to cart!" : "Product added to cart!",
-                    cartCount = await _context.CartItems.Where(ci => ci.CartId == cart.Id).SumAsync(ci => ci.Quantity)
-                });
-            }
-            
-            // Otherwise redirect to home page
-            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
