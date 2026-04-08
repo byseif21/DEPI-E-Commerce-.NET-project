@@ -140,6 +140,91 @@
 .admin-btn-info:hover      { background-color: #0b7dda; color: white; }
 .admin-btn-warning:hover   { background-color: #e68a00; color: white; }
 
+/* ------ Dropdowns ------ */
+.admin-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.admin-dropdown-toggle::after {
+    display: inline-block;
+    margin-left: 0.255em;
+    vertical-align: 0.255em;
+    content: "";
+    border-top: 0.3em solid;
+    border-right: 0.3em solid transparent;
+    border-bottom: 0;
+    border-left: 0.3em solid transparent;
+}
+
+.admin-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1000;
+    display: none;
+    min-width: 10rem;
+    padding: 0.5rem 0;
+    margin: 0.125rem 0 0;
+    font-size: 0.875rem;
+    color: var(--admin-dark);
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.admin-dropdown:hover .admin-dropdown-menu,
+.admin-dropdown:focus-within .admin-dropdown-menu {
+    display: block;
+}
+
+.admin-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    clear: both;
+    font-weight: 400;
+    color: var(--admin-dark);
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+    transition: var(--transition);
+    text-decoration: none !important;
+}
+
+.admin-dropdown-item:hover {
+    background-color: var(--admin-light);
+    color: var(--admin-secondary);
+}
+
+.admin-dropdown-form-item {
+    padding: 0;
+    margin: 0;
+}
+
+.admin-dropdown-form-item button {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    background: none;
+    border: none;
+    color: var(--admin-dark);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.admin-dropdown-form-item button:hover {
+    background-color: var(--admin-light);
+    color: var(--admin-secondary);
+}
+
 /* ------ Tables ------ */
 .admin-table-container {
     background-color: white;
