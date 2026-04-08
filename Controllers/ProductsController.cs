@@ -18,15 +18,23 @@ namespace Styleza.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Shop(string category = null, string tags = null, decimal? minPrice = null, decimal? maxPrice = null, string color = null, string sizes = null, string sort = "default", int page = 1)
+        public async Task<IActionResult> Shop(string category = null, string tags = null, decimal? priceMin = null, decimal? priceMax = null, string colors = null, string sizes = null, string sort = "default", int page = 1, string search = null)
         {
             var viewModel = new ShopViewModel();
             var productsQuery = _context.Products.Include(p => p.Category).AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                productsQuery = productsQuery.Where(p => p.Name.Contains(search) || p.Description.Contains(search));
+            }
             
             // Set up filter options
-            viewModel.Filters.Category = category ?? "all";
-            viewModel.Filters.PriceMin = minPrice;
-            viewModel.Filters.PriceMax = maxPrice;
+            viewModel.Filters.Category = (category ?? "all").ToLower();
+            
+            // Get absolute total items (for "All Products" count)
+            viewModel.TotalItems = await _context.Products.CountAsync();
+            viewModel.Filters.PriceMin = priceMin;
+            viewModel.Filters.PriceMax = priceMax;
             viewModel.Filters.Sort = sort;
             viewModel.CurrentPage = page;
             
@@ -37,10 +45,12 @@ namespace Styleza.Controllers
                 productsQuery = productsQuery.Where(p => p.Tags != null && viewModel.Filters.Tags.Any(t => p.Tags.Contains(t)));
             }
             
-            if (!string.IsNullOrEmpty(color))
+            if (!string.IsNullOrEmpty(colors))
             {
-                viewModel.Filters.Colors = color.Split(',').ToList();
-                productsQuery = productsQuery.Where(p => p.Color != null && viewModel.Filters.Colors.Contains(p.Color.ToLower()));
+                viewModel.Filters.Colors = colors.Split(',').ToList();
+                // We'll normalize the colors to handle both name and hex (case-insensitive)
+                var colorList = viewModel.Filters.Colors.Select(c => c.ToLower()).ToList();
+                productsQuery = productsQuery.Where(p => p.Color != null && colorList.Any(cl => p.Color.ToLower().Contains(cl)));
             }
             
             if (!string.IsNullOrEmpty(sizes))
@@ -61,14 +71,14 @@ namespace Styleza.Controllers
             }
             
             // Apply price filters
-            if (minPrice.HasValue)
+            if (priceMin.HasValue)
             {
-                productsQuery = productsQuery.Where(p => p.Price >= minPrice.Value);
+                productsQuery = productsQuery.Where(p => p.Price >= priceMin.Value);
             }
             
-            if (maxPrice.HasValue)
+            if (priceMax.HasValue)
             {
-                productsQuery = productsQuery.Where(p => p.Price <= maxPrice.Value);
+                productsQuery = productsQuery.Where(p => p.Price <= priceMax.Value);
             }
             
             // Apply sorting
@@ -92,11 +102,9 @@ namespace Styleza.Controllers
                     break;
             }
             
-            // Get total count for pagination
-            viewModel.TotalItems = await productsQuery.CountAsync();
-            
-            // Calculate total pages (9 items per page)
-            viewModel.TotalPages = (int)Math.Ceiling(viewModel.TotalItems / 9.0);
+            // Get total count for pagination (only items in current filter)
+            var filteredCount = await productsQuery.CountAsync();
+            viewModel.TotalPages = (int)Math.Ceiling(filteredCount / 9.0);
             
             // Apply pagination
             var products = await productsQuery

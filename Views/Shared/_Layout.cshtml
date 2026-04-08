@@ -138,10 +138,10 @@
                         <h3>Search for products</h3>
                         <div class="search-close"><i class="fas fa-times"></i></div>
                     </div>
-                    <div class="search-form">
-                        <input type="text" placeholder="Search for products...">
+                    <form asp-controller="Products" asp-action="Shop" method="get" class="search-form">
+                        <input type="text" name="search" placeholder="Search for products...">
                         <button type="submit"><i class="fas fa-search"></i></button>
-                    </div>
+                    </form>
                     <div class="search-popular">
                         <h4>Popular Searches:</h4>
                         <div class="popular-tags">

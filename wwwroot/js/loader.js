@@ -28,8 +28,8 @@
             l.classList.remove('hidden');
             l.style.display = 'flex';
             
-            // Safety timeout: Never stay visible more than 5 seconds unless it's a real navigation
-            if (reason !== 'beforeunload_event' && reason !== 'link_navigation') {
+            // Safety timeout: Never stay visible more than 5 seconds unless it's a real navigation (beforeunload)
+            if (reason !== 'beforeunload_event') {
                 setTimeout(() => {
                     const currentLoader = getLoader();
                     if (currentLoader && !currentLoader.classList.contains('hidden')) {
@@ -65,6 +65,9 @@
             
             // Ignore if not a link or has no href
             if (!link || !link.href) return;
+
+            // IGNORE if the event was already handled/prevented by another script (e.g., client-side tabs, modal triggers)
+            if (e.defaultPrevented) return;
 
             // Ignore modifier-key navigation (opens in new tab/window, doesn't navigate current page)
             if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
@@ -110,6 +113,8 @@
 
     // Also catch form submissions
     document.addEventListener('submit', (e) => {
+        if (e.defaultPrevented) return;
+        
         if (!e.target.classList.contains('no-loader')) {
             window.showLoader('form_submission');
         }

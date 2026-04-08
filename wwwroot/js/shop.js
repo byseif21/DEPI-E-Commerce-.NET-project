@@ -54,9 +54,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // ----- EVENT LISTENERS -----
 
     // Mobile menu toggle
-    hamburger.addEventListener('click', toggleMobileMenu);
+    if (hamburger) {
+        hamburger.addEventListener('click', toggleMobileMenu);
+    }
 
-    // Category filter
+    // Category filter - Server-side navigation is preferred for SEO and robustness
+    /*
     categoryLinks.forEach(link => {
         link.addEventListener('click', function (e) {
             e.preventDefault();
@@ -66,17 +69,24 @@ document.addEventListener('DOMContentLoaded', function () {
             filterProducts();
         });
     });
+    */
 
     // Price filter
-    priceFilterBtn.addEventListener('click', function () {
-        const minInput = document.querySelector('.price-input:first-child input');
-        const maxInput = document.querySelector('.price-input:last-child input');
-
-        activeFilters.priceMin = Number(minInput.value);
-        activeFilters.priceMax = Number(maxInput.value);
-
-        filterProducts();
-    });
+    if (priceFilterBtn) {
+        priceFilterBtn.addEventListener('click', function () {
+            // Price filtering is now handled by the form submission in Shop.cshtml
+            // If we want client-side, we would call e.preventDefault() here
+            
+            const minInput = document.querySelector('.price-input:first-child input');
+            const maxInput = document.querySelector('.price-input:last-child input');
+            
+            if (minInput && maxInput) {
+                activeFilters.priceMin = Number(minInput.value);
+                activeFilters.priceMax = Number(maxInput.value);
+                filterProducts();
+            }
+        });
+    }
 
     // Color filters
     colorFilters.forEach(colorFilter => {
@@ -391,40 +401,19 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 productsGrid.classList.remove('grid-view');
                 productsGrid.classList.add('list-view');
-
-                // In list view, we might need to adjust the product cards styling
-                productCards.forEach(card => {
-                    if (!card.classList.contains('list-view-processed')) {
-                        const productImg = card.querySelector('.product-img-container');
-                        const productInfo = card.querySelector('.product-info');
-
-                        if (productImg && productInfo) {
-                            card.style.display = 'flex';
-                            productImg.style.width = '30%';
-                            productImg.style.height = '220px';
-                            productInfo.style.width = '70%';
-                            productInfo.style.padding = '20px 30px';
-
-                            // Add a short description in list view
-                            const descElement = document.createElement('div');
-                            descElement.className = 'product-description';
-                            descElement.innerHTML = '<p>Premium quality product crafted with the finest materials. Perfect for any occasion.</p>';
-
-                            // Insert after price and before add to cart button
-                            const addToCartBtn = card.querySelector('.add-to-cart');
-                            if (addToCartBtn) {
-                                productInfo.insertBefore(descElement, addToCartBtn);
-                            } else {
-                                productInfo.appendChild(descElement);
-                            }
-
-                            card.classList.add('list-view-processed');
-                        }
-                    }
-                });
             }
         }
+        
+        // Update view buttons active state
+        viewBtns.forEach(btn => {
+            if (btn.getAttribute('data-view') === viewType) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
     }
+
 
     // Sort products
     function sortProducts() {

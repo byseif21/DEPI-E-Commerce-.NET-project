@@ -23,6 +23,13 @@
     <div class="container shop-container">
         <!-- Shop Sidebar -->
         <div class="shop-sidebar">
+            <div class="sidebar-top">
+                <h2 class="sidebar-main-title">Filters</h2>
+                <a href="@Url.Action("Shop", "Products")" class="clear-filters-btn">
+                    <i class="fas fa-redo-alt"></i> Clear All
+                </a>
+            </div>
+
             <!-- Categories Widget -->
             <div class="sidebar-widget">
                 <h3 class="widget-title">Categories</h3>
@@ -40,7 +47,7 @@
                 <h3 class="widget-title">Filter By Price</h3>
                 <form class="price-filter" method="get" action="@Url.Action("Shop", "Products")">
                     <input type="hidden" name="category" value="@Model.Filters.Category" />
-                    <input type="hidden" name="color" value="@String.Join(",", Model.Filters.Colors)" />
+                    <input type="hidden" name="colors" value="@String.Join(",", Model.Filters.Colors)" />
                     <input type="hidden" name="sizes" value="@String.Join(",", Model.Filters.Sizes)" />
                     <input type="hidden" name="tags" value="@String.Join(",", Model.Filters.Tags)" />
                     <input type="hidden" name="sort" value="@Model.Filters.Sort" />
@@ -121,8 +128,8 @@
                 <div class="products-found">Showing @(Math.Min((Model.CurrentPage - 1) * 9 + 1, Model.TotalItems))–@Math.Min(Model.CurrentPage * 9, Model.TotalItems) of @Model.TotalItems results</div>
                 <div class="shop-filters">
                     <div class="shop-view">
-                        <div class="view-btn active"><i class="fas fa-th"></i></div>
-                        <div class="view-btn"><i class="fas fa-list"></i></div>
+                        <div class="view-btn active" data-view="grid" onclick="changeView('grid')"><i class="fas fa-th"></i></div>
+                        <div class="view-btn" data-view="list" onclick="changeView('list')"><i class="fas fa-list"></i></div>
                     </div>
                     <div class="shop-sort">
                         <select onchange="updateSort(this.value)">
@@ -175,6 +182,7 @@
                                     <span class="old-price">$@product.OldPrice.Value.ToString("F2")</span>
                                 }
                             </div>
+                            <p class="product-description-list">@product.Description</p>
                             <a href="#" class="add-to-cart @(product.IsInStock ? "" : "disabled")"
                                data-product-id="@product.Id">@(product.IsInStock ? "Add to Cart" : "Out of Stock")</a>
                         </div>
@@ -209,7 +217,11 @@
     function updateFilter(type, value, element) {
         element.classList.toggle('active');
         var urlParams = new URLSearchParams(window.location.search);
-        var currentValues = urlParams.get(type)?.split(',')?.filter(v => v) || [];
+        
+        // Ensure we use the correct parameter name (controller expects 'colors')
+        var paramName = type === 'colors' ? 'colors' : type;
+        
+        var currentValues = urlParams.get(paramName)?.split(',')?.filter(v => v) || [];
 
         if (element.classList.contains('active')) {
             if (!currentValues.includes(value)) {
@@ -219,8 +231,14 @@
             currentValues = currentValues.filter(v => v !== value);
         }
 
-        urlParams.set(type, currentValues.join(','));
-        if (!currentValues.length) urlParams.delete(type);
+        if (currentValues.length > 0) {
+            urlParams.set(paramName, currentValues.join(','));
+        } else {
+            urlParams.delete(paramName);
+        }
+        
+        // Reset page when filtering
+        urlParams.delete('page');
 
         window.location.href = '@Url.Action("Shop", "Products")?' + urlParams.toString();
     }
