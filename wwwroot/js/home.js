@@ -338,23 +338,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Show loader for the duration of the AJAX call
                 if (typeof window.showLoader === 'function') window.showLoader('add_to_cart_ajax');
 
-                console.log('[Styleza Debug] Sending AddToCart request for product:', productId);
                 fetch(`/Cart/AddToCart?productId=${productId}&quantity=1`, {
                     method: 'POST',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .then(response => {
-                    console.log('[Styleza Debug] Response status:', response.status);
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    console.log('[Styleza Debug] Response data:', data);
                     if (typeof window.hideLoader === 'function') window.hideLoader('add_to_cart_done');
 
                     if (data.success) {
-                        console.log('[Styleza Debug] Success! New cart count:', data.cartCount);
                         // Update cart count
                         const cartCountElements = document.querySelectorAll('.cart-count');
                         cartCountElements.forEach(el => {

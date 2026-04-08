@@ -9,7 +9,7 @@
     const getLoader = () => document.querySelector('.styleza-loader-container');
     
     // Safety check: Create loader if it doesn't exist (fallback)
-    function ensrueLoader() {
+    function ensureLoader() {
         if (getLoader()) return getLoader();
         
         console.warn('[Styleza Loader] Loader element not found, creating dynamic fallback');
@@ -23,7 +23,7 @@
     // Export show function
     window.showLoader = function(reason = 'unknown') {
         console.log('[Styleza Loader] Showing. Reason:', reason);
-        const l = ensrueLoader();
+        const l = ensureLoader();
         if (l) {
             l.classList.remove('hidden');
             l.style.display = 'flex';

@@ -16,7 +16,7 @@ namespace Styleza.Extensions
         /// <param name="controller">The controller instance</param>
         /// <param name="errorMessage">The main error message</param>
         /// <param name="modelState">Optional ModelState containing validation errors</param>
-        public static void AddErrorMessage(this Controller controller, string errorMessage, ModelStateDictionary modelState = null)
+        public static void AddErrorMessage(this Controller controller, string errorMessage, ModelStateDictionary? modelState = null)
         {
             controller.ViewBag.ErrorMessage = errorMessage;
             

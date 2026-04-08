@@ -77,7 +77,7 @@
                             <label class="admin-form-label">Product Image</label>
                             <input type="file" name="ProductImage" class="admin-form-control" accept="image/*" />
                             <small class="form-text text-muted">Upload a product image (JPG, PNG, or GIF). Maximum size: 5MB.</small>
-                            <input asp-for="ImageUrl" type="hidden" value="/asset/img/products/placeholder.jpg" />
+                            <input asp-for="ImageUrl" type="hidden" value="@(string.IsNullOrWhiteSpace(Model?.ImageUrl) ? string.Empty : Model.ImageUrl)" />
                             <span asp-validation-for="ImageUrl" class="text-danger"></span>
                         </div>
                         

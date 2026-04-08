@@ -305,16 +305,6 @@
 
     @RenderSection("Scripts", required: false)
 
-    <!-- Emergency Loader Hide (Failsafe) -->
-    <script>
-        setTimeout(function() {
-            var l = document.querySelector('.styleza-loader-container');
-            if (l && !l.classList.contains('hidden')) {
-                console.warn('[Styleza] Emergency loader hide triggered');
-                l.classList.add('hidden');
-                setTimeout(function() { l.style.display = 'none'; }, 300);
-            }
-        }, 2000);
-    </script>
+
 </body>
 </html>
