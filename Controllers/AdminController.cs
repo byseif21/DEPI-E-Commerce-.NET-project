@@ -4,12 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Styleza.Data;
 using Styleza.Models;
 using Microsoft.AspNetCore.Authorization;
-//using System;
-//using System.Threading.Tasks;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.IO;
-//using Microsoft.AspNetCore.Http;
 
 namespace Styleza.Controllers
 {
@@ -260,7 +254,7 @@ namespace Styleza.Controllers
                 IsInStock = true,
                 StockQuantity = 1,
                 Images = new List<ProductImage>(),
-                ProductId = new Random().Next(1000, 999999) // Pre-generate ProductId
+                ProductId = Math.Abs(Guid.NewGuid().GetHashCode()) // Collision-safe unique ProductId
             };
             return View(product);
         }
@@ -286,8 +280,8 @@ namespace Styleza.Controllers
 
             try
             {
-                // Generate a random ProductId for display purposes
-                product.ProductId = new Random().Next(1000, 999999);
+                // Generate a collision-safe ProductId
+                product.ProductId = Math.Abs(Guid.NewGuid().GetHashCode());
                 product.Id = 0; // Ensure it's treated as a new product
 
                 // Handle file upload
@@ -422,7 +416,7 @@ namespace Styleza.Controllers
         public async Task<IActionResult> UpdateOrderStatus(int id, string status)
         {
             // Validate order status against whitelist to prevent persistence of arbitrary strings
-            var validStatuses = new[] { "Processing", "Shipped", "Delivered", "Cancelled" };
+            var validStatuses = new[] { "Processing", "Shipped", "Delivered", "Cancelled", "Completed" };
             if (!validStatuses.Contains(status))
             {
                 return BadRequest("Invalid order status");
