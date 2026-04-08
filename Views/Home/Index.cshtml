@@ -1,15 +1,17 @@
-﻿@using Styleza.Data
+@model IEnumerable<Styleza.Models.Product>
+@using Styleza.Data
 @using Styleza.Models
 @using Microsoft.AspNetCore.Identity
 @inject ApplicationDbContext DbContext
 @inject UserManager<IdentityUser> UserManager
 @{
     ViewData["Title"] = "Home";
-    @section Styles {
-        <link rel="stylesheet" href="~/css/home.css" />
-    }
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/home.css" />
+}
+
 <!-- Hero Section -->
 <section class="hero">
     <div class="hero-slider">
@@ -79,9 +81,11 @@
             <h2 class="section-title">Featured Products</h2>
         </div>
         <div class="products-grid">
-            @foreach (var product in DbContext.Products.OrderBy(p => Guid.NewGuid()).Take(4))
+            @foreach (var product in Model)
             {
-                var primaryImage = DbContext.ProductImages.FirstOrDefault(pi => pi.ProductId == product.Id && pi.IsPrimary)?.ImageUrl ?? "/asset/img/placeholder.png";
+                var primaryImage = product.Images.FirstOrDefault(i => i.IsPrimary)?.ImageUrl 
+                                ?? product.ImageUrl 
+                                ?? "/asset/img/placeholder.png";
                 var label = product.OldPrice > 0 ? "Sale" : (product.StockQuantity > 0 ? "New" : "Hot");
                 <div class="product-card">
                     <div class="product-img-container">
@@ -100,7 +104,7 @@
                         <div class="product-label">@label</div>
                     </div>
                     <div class="product-info">
-                        <div class="product-category">@DbContext.Categories.FirstOrDefault(c => c.Id == product.CategoryId)?.Name</div>
+                        <div class="product-category">@(product.Category?.Name ?? "Uncategorized")</div>
                         <h3 class="product-title">@product.Name</h3>
                         <div class="product-price">
                             <div class="current-price">$@product.Price.ToString("F2")</div>

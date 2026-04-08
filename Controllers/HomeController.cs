@@ -27,6 +27,7 @@ namespace Styleza.Controllers
         {
             var products = _context.Products
                 .Include(p => p.Images)
+                .Include(p => p.Category)
                 .OrderBy(p => Guid.NewGuid())
                 .Take(4)
                 .ToList();

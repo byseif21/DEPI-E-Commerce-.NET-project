@@ -87,7 +87,7 @@ namespace Styleza.Controllers
                 return Json(new { 
                     success = true, 
                     message = product != null ? $"{product.Name} added to cart!" : "Product added to cart!",
-                    cartCount = await _context.CartItems.CountAsync(c => c.UserId == userId)
+                    cartCount = await _context.CartItems.Where(ci => ci.CartId == cart.Id).SumAsync(ci => ci.Quantity)
                 });
             }
             

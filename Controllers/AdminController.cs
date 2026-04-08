@@ -137,17 +137,25 @@ namespace Styleza.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditProduct(Product product, IFormFile ProductImage)
+        public async Task<IActionResult> EditProduct(Product product, IFormFile? ProductImage)
         {
-            if (ModelState.IsValid)
+            // Remove navigation properties from validation
+            ModelState.Remove("Category");
+            ModelState.Remove("Images");
+
+            if (!ModelState.IsValid)
             {
-                // Handle file upload if a new image is provided
+                ViewBag.Categories = await _context.Categories.ToListAsync();
+                return View(product);
+            }
+
+            try
+            {
+                // Handle file upload
                 if (ProductImage != null && ProductImage.Length > 0)
                 {
-                    // Validate file type
                     var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
                     var fileExtension = Path.GetExtension(ProductImage.FileName).ToLowerInvariant();
-                    string fileName = string.Empty; // Declare fileName outside the try block
                     
                     if (!allowedExtensions.Contains(fileExtension))
                     {
@@ -158,71 +166,60 @@ namespace Styleza.Controllers
                     
                     try
                     {
-                        // Create a unique filename
-                        fileName = $"{Guid.NewGuid()}{fileExtension}";
+                        string fileName = $"{Guid.NewGuid()}{fileExtension}";
                         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "asset", "img", "products", fileName);
                         
-                        // Ensure directory exists
                         var directory = Path.GetDirectoryName(filePath);
                         if (!Directory.Exists(directory))
                         {
                             Directory.CreateDirectory(directory);
                         }
                         
-                        // Save the file
                         using (var fileStream = new FileStream(filePath, FileMode.Create))
                         {
                             await ProductImage.CopyToAsync(fileStream);
                         }
                         
-                        // Set the ImageUrl property to the relative path
                         product.ImageUrl = $"/asset/img/products/{fileName}";
+                        
+                        // Update the images collection
+                        var existingImages = await _context.ProductImages
+                            .Where(i => i.ProductId == product.Id)
+                            .ToListAsync();
+                            
+                        // Mark existing primary images as non-primary
+                        foreach (var img in existingImages)
+                        {
+                            img.IsPrimary = false;
+                        }
+                        
+                        // Add new primary image
+                        _context.ProductImages.Add(new ProductImage
+                        {
+                            ImageUrl = product.ImageUrl,
+                            ProductId = product.Id,
+                            IsPrimary = true
+                        });
                     }
                     catch (Exception ex)
                     {
-                        // Log the error
-                        Console.WriteLine($"Error saving image: {ex.Message}");
                         ModelState.AddModelError("ProductImage", $"Error saving image: {ex.Message}");
                         ViewBag.Categories = await _context.Categories.ToListAsync();
                         return View(product);
                     }
-                    
-                    // Set the ImageUrl property to the relative path
-                    product.ImageUrl = $"/asset/img/products/{fileName}";
-                    
-                    // Create a ProductImage entry if it doesn't exist
-                    var existingProduct = await _context.Products
-                        .Include(p => p.Images)
-                        .FirstOrDefaultAsync(p => p.Id == product.Id);
-                    
-                    if (existingProduct != null)
-                    {
-                        // Update existing primary image or add a new one
-                        var primaryImage = existingProduct.Images.FirstOrDefault(i => i.IsPrimary);
-                        if (primaryImage != null)
-                        {
-                            primaryImage.ImageUrl = product.ImageUrl;
-                        }
-                        else
-                        {
-                            existingProduct.Images.Add(new ProductImage
-                            {
-                                ImageUrl = product.ImageUrl,
-                                ProductId = product.Id,
-                                IsPrimary = true
-                            });
-                        }
-                    }
                 }
-                // If no new image is uploaded, keep the existing image
-                // The product.ImageUrl will already contain the existing image URL from the form
                 
                 _context.Update(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(ProductManagement));
             }
-            ViewBag.Categories = await _context.Categories.ToListAsync();
-            return View(product);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating product: {ex.Message}");
+                ModelState.AddModelError("", $"A database error occurred: {ex.Message}");
+                ViewBag.Categories = await _context.Categories.ToListAsync();
+                return View(product);
+            }
         }
 
         public IActionResult CreateProduct()
@@ -240,73 +237,35 @@ namespace Styleza.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProduct(Product product, IFormFile ProductImage)
+        public async Task<IActionResult> CreateProduct(Product product, IFormFile? ProductImage)
         {
-            // Ensure Images collection is initialized
-            if (product.Images == null)
-            {
-                product.Images = new List<ProductImage>();
-            }
-            
-            // The ProductId field is redundant with Id but required by the model
-            // For new products, we'll generate a random value to ensure it's not 0
-            // This is important as the ProductId must be unique
-            product.ProductId = new Random().Next(1000, 999999);
-            
-            // Ensure we're creating a new product (Id should be 0)
-            product.Id = 0;
-            
-            // Log all model state errors to help with debugging
-            Console.WriteLine("Model State Validation Status: " + ModelState.IsValid);
-            foreach (var key in ModelState.Keys)
-            {
-                var state = ModelState[key];
-                if (state.Errors.Count > 0)
-                {
-                    Console.WriteLine($"Field: {key} has the following errors:");
-                    foreach (var error in state.Errors)
-                    {
-                        Console.WriteLine($"  - {error.ErrorMessage}");
-                    }
-                }
-            }
-            
-            // Explicitly check if CategoryId is valid
+            // Initial validation checks
             if (product.CategoryId <= 0)
             {
                 ModelState.AddModelError("CategoryId", "Please select a valid category");
             }
             
-            // Check if the model is valid before proceeding
+            // Remove Category navigation property from validation if it's null (it will be populated later if needed)
+            ModelState.Remove("Category");
+
             if (!ModelState.IsValid)
             {
-                // Return to the form with validation errors
                 ViewBag.Categories = await _context.Categories.ToListAsync();
-                ViewBag.ValidationErrors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToList();
-                ViewBag.ErrorMessage = "Please correct the validation errors and try again.";
+                ViewBag.ErrorMessage = "Please correct the validation errors below.";
                 return View(product);
             }
 
             try
             {
-                // Handle color field - if it's not a hex color code, it might be a color name
-                if (!string.IsNullOrEmpty(product.Color) && !product.Color.StartsWith("#"))
-                {
-                    // Map common color names to hex values if needed
-                    // For now, we'll just accept the color name as is
-                    // This allows users to enter "White" instead of "#FFFFFF"
-                }
-                
+                // Generate a random ProductId for display purposes
+                product.ProductId = new Random().Next(1000, 999999);
+                product.Id = 0; // Ensure it's treated as a new product
+
                 // Handle file upload
                 if (ProductImage != null && ProductImage.Length > 0)
                 {
-                    // Validate file type
                     var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
                     var fileExtension = Path.GetExtension(ProductImage.FileName).ToLowerInvariant();
-                    string fileName = string.Empty; // Declare fileName outside the try block
                     
                     if (!allowedExtensions.Contains(fileExtension))
                     {
@@ -317,146 +276,68 @@ namespace Styleza.Controllers
                     
                     try
                     {
-                        // Create a unique filename
-                        fileName = $"{Guid.NewGuid()}{fileExtension}";
+                        string fileName = $"{Guid.NewGuid()}{fileExtension}";
                         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "asset", "img", "products", fileName);
                         
-                        // Ensure directory exists
                         var directory = Path.GetDirectoryName(filePath);
                         if (!Directory.Exists(directory))
                         {
                             Directory.CreateDirectory(directory);
                         }
                         
-                        // Save the file
                         using (var fileStream = new FileStream(filePath, FileMode.Create))
                         {
                             await ProductImage.CopyToAsync(fileStream);
                         }
                         
-                        // Set the ImageUrl property to the relative path
                         product.ImageUrl = $"/asset/img/products/{fileName}";
+                        
+                        // Add to Images collection
+                        product.Images.Add(new ProductImage
+                        {
+                            ImageUrl = product.ImageUrl,
+                            IsPrimary = true
+                        });
                     }
                     catch (Exception ex)
                     {
-                        // Log the error
-                        Console.WriteLine($"Error saving image: {ex.Message}");
                         ModelState.AddModelError("ProductImage", $"Error saving image: {ex.Message}");
                         ViewBag.Categories = await _context.Categories.ToListAsync();
                         return View(product);
                     }
-                    
-                    // Create a ProductImage entry
-                    var productImage = new ProductImage
-                    {
-                        ImageUrl = product.ImageUrl,
-                        IsPrimary = true,
-                        // We can't set ProductId yet as the product hasn't been saved
-                        // The relationship will be managed by EF Core when saving
-                    };
-                    
-                    product.Images.Add(productImage);
                 }
                 else if (string.IsNullOrEmpty(product.ImageUrl) || product.ImageUrl == "/asset/img/products/placeholder.jpg")
                 {
-                    // If no image is uploaded and no custom ImageUrl is provided, use a placeholder
                     product.ImageUrl = "/asset/img/products/placeholder.jpg";
-                    
-                    // Create a ProductImage entry for the placeholder
-                    var productImage = new ProductImage
+                    product.Images.Add(new ProductImage
                     {
                         ImageUrl = product.ImageUrl,
                         IsPrimary = true
-                        // ProductId will be set automatically by EF Core when the product is saved
-                    };
-                    
-                    product.Images.Add(productImage);
+                    });
                 }
                 
-                // We don't need to check these fields manually as they're already validated by data annotations
-                // in the Product model. The ModelState.IsValid check above will catch these issues.
-                
-                try
+                // Final check for Category existence
+                var category = await _context.Categories.FindAsync(product.CategoryId);
+                if (category == null)
                 {
-                    // Ensure the product has a valid category
-                    var category = await _context.Categories.FindAsync(product.CategoryId);
-                    if (category == null)
-                    {
-                        ModelState.AddModelError("CategoryId", "Selected category does not exist");
-                        ViewBag.Categories = await _context.Categories.ToListAsync();
-                        ViewBag.ErrorMessage = "Please select a valid category";
-                        return View(product);
-                    }
-
-                    // Ensure required fields are set
-                    if (string.IsNullOrEmpty(product.Name))
-                    {
-                        ModelState.AddModelError("Name", "Product name is required");
-                    }
-                    
-                    if (string.IsNullOrEmpty(product.Description))
-                    {
-                        ModelState.AddModelError("Description", "Description is required");
-                    }
-                    
-                    if (product.Price <= 0)
-                    {
-                        ModelState.AddModelError("Price", "Price must be greater than 0");
-                    }
-                    
-                if (product.CategoryId <= 0)
-                {
-                    ModelState.AddModelError("CategoryId", "Please select a category");
-                }
-                
-                // Check if there are any validation errors
-                if (!ModelState.IsValid)
-                    {
-                        ViewBag.Categories = await _context.Categories.ToListAsync();
-                        ViewBag.ValidationErrors = ModelState.Values
-                            .SelectMany(v => v.Errors)
-                            .Select(e => e.ErrorMessage)
-                            .ToList();
-                        ViewBag.ErrorMessage = "Please correct the validation errors and try again.";
-                        return View(product);
-                    }
-                    
-                    // Add the product to the context
-                    _context.Products.Add(product);
-                    
-                    // Save changes to the database
-                    await _context.SaveChangesAsync();
-                    
-                    // Redirect to product management page on success
-                    return RedirectToAction(nameof(ProductManagement));
-                }
-                catch (Exception ex)
-                {
-                    // Log the error
-                    Console.WriteLine($"Error saving product to database: {ex.Message}");
-                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                    
-                    // Add error message to model state
-                    ModelState.AddModelError("", $"Database error: {ex.Message}");
-                    
-                    // Return to the form with the error
+                    ModelState.AddModelError("CategoryId", "Selected category does not exist");
                     ViewBag.Categories = await _context.Categories.ToListAsync();
-                    ViewBag.ErrorMessage = "A database error occurred while saving the product. Please try again.";
                     return View(product);
                 }
+
+                _context.Products.Add(product);
+                await _context.SaveChangesAsync();
+                
+                return RedirectToAction(nameof(ProductManagement));
             }
             catch (Exception ex)
             {
-                // Log the exception details
+                // Log the exception (in a real app, use a logger)
                 Console.WriteLine($"Error saving product: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 
-                // Add error message to model state
-                ModelState.AddModelError("", $"Unable to save the product: {ex.Message}");
-                
-                // Return to the form with the error
+                ModelState.AddModelError("", $"A database error occurred: {ex.Message}");
                 ViewBag.Categories = await _context.Categories.ToListAsync();
-                ViewBag.ErrorMessage = "An error occurred while saving the product. Please try again.";
+                ViewBag.ErrorMessage = "An unexpected error occurred while saving the product.";
                 return View(product);
             }
         }
