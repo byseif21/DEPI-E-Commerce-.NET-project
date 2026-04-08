@@ -1,4 +1,4 @@
-﻿// DOM Elements
+// DOM Elements
 document.addEventListener('DOMContentLoaded', function () {
     // Navigation elements
     const navItems = document.querySelectorAll('.nav-item');
@@ -172,6 +172,10 @@ document.addEventListener('DOMContentLoaded', function () {
     addToCartBtns.forEach((btn, index) => {
         btn.addEventListener('click', function (e) {
             e.preventDefault();
+            
+            // Prevent adding to cart if product is out of stock
+            if (this.classList.contains('disabled')) return;
+            
             const productCard = productCards[index];
             const productId = btn.getAttribute('data-product-id');
             
@@ -195,12 +199,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Show notification
                     showNotification(data.message);
                     
-                    // Show mini cart 
-                    setTimeout(() => {
-                        if (typeof showMiniCart === 'function') {
-                            showMiniCart();
-                        }
-                    }, 500);
+
                 } else {
                     showNotification(data.message || 'Failed to add item to cart');
                 }
@@ -556,42 +555,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-    // Show notification
-    function showNotification(message) {
-        // Remove any existing notification
-        const existingNotification = document.querySelector('.notification');
-        if (existingNotification) {
-            document.body.removeChild(existingNotification);
-        }
-        
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.innerHTML = `
-            <div class="notification-content">
-                <i class="fas fa-check-circle"></i>
-                <span>${message}</span>
-            </div>
-        `;
-        
-        // Add to DOM
-        document.body.appendChild(notification);
-        
-        // Show notification
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 10);
-        
-        // Auto hide after 3 seconds
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    document.body.removeChild(notification);
-                }
-            }, 300);
-        }, 3000);
-    }
+
 
     // Toggle wishlist
     function toggleWishlist(productCard) {
@@ -679,7 +643,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             </div>
                         </div>
                         <div class="product-actions">
-                            <button class="add-to-cart-btn">Add to Cart</button>
+                            <button class="add-to-cart-btn @(productCard.querySelector('.add-to-cart')?.classList.contains('disabled') ? 'disabled' : '')" 
+                                    @(productCard.querySelector('.add-to-cart')?.classList.contains('disabled') ? 'disabled' : '')>
+                                @(productCard.querySelector('.add-to-cart')?.textContent || 'Add to Cart')
+                            </button>
                             <button class="wishlist-btn"><i class="far fa-heart"></i></button>
                             <button class="compare-btn"><i class="fas fa-sync-alt"></i></button>
                         </div>
@@ -734,6 +701,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Set up add to cart functionality in the modal
         const addToCartBtn = modal.querySelector('.add-to-cart-btn');
         addToCartBtn.addEventListener('click', () => {
+            if (addToCartBtn.classList.contains('disabled')) return;
+            
             const quantity = parseInt(qtyInput.value);
 
             // Find if product is already in cart

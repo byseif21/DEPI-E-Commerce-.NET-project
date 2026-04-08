@@ -1,0 +1,63 @@
+@model List<Styleza.Models.Category>
+@{
+    ViewData["Title"] = "Category Management";
+}
+
+<div class="container admin-dashboard">
+    <h1>Category Management</h1>
+    <div class="d-flex justify-content-between mb-3">
+        <a asp-action="Index" class="admin-btn admin-btn-secondary"><i class="fas fa-arrow-left me-2"></i>Back to Dashboard</a>
+        <a asp-action="CreateCategory" class="admin-btn admin-btn-success"><i class="fas fa-plus me-2"></i>Add New Category</a>
+    </div>
+    
+    <div class="admin-table-container">
+        <div class="admin-card-header">
+            <i class="fas fa-tags me-2"></i> Categories
+        </div>
+        <div class="admin-card-body">
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Sub-Categories</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var category in Model)
+                        {
+                            <tr>
+                                <td>@category.Name</td>
+                                <td>@category.Description</td>
+                                <td>
+                                    @if (category.SubCategories != null && category.SubCategories.Any())
+                                    {
+                                        <ul class="list-unstyled mb-0">
+                                            @foreach (var subCategory in category.SubCategories)
+                                            {
+                                                <li>@subCategory.Name</li>
+                                            }
+                                        </ul>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No sub-categories</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="EditCategory" asp-route-id="@category.Id" class="admin-btn admin-btn-primary admin-btn-sm"><i class="fas fa-edit me-1"></i>Edit</a>
+                                    <form asp-action="DeleteCategory" method="post" style="display: inline;">
+                                        <input type="hidden" name="id" value="@category.Id" />
+                                        <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm" onclick="return confirm('Are you sure you want to delete this category? This will also delete all associated products.');"><i class="fas fa-trash-alt me-1"></i>Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

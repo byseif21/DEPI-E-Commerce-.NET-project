@@ -1,4 +1,4 @@
-﻿// Navigation and Header Functionality
+// Navigation and Header Functionality
 document.addEventListener('DOMContentLoaded', function () {
     // Header scroll effect
     const header = document.querySelector('header');
@@ -314,47 +314,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Add to Cart Animation
-    const addToCartButtons = document.querySelectorAll('.add-to-cart');
-    const cartIcon = document.querySelector('.cart-icon');
 
-    if (addToCartButtons.length > 0 && cartIcon) {
-        addToCartButtons.forEach(button => {
-            button.addEventListener('click', function (e) {
-                e.preventDefault();
 
-                // Update cart count
-                const cartCount = document.querySelector('.cart-count');
-                if (cartCount) {
-                    let count = parseInt(cartCount.textContent);
-                    cartCount.textContent = count + 1;
 
-                    // Animation
-                    cartIcon.classList.add('pulse');
-                    setTimeout(() => {
-                        cartIcon.classList.remove('pulse');
-                    }, 500);
-                }
 
-                // Show success message
-                const successMessage = document.createElement('div');
-                successMessage.className = 'add-to-cart-success';
-                successMessage.textContent = 'Added to cart!';
-                document.body.appendChild(successMessage);
 
-                setTimeout(() => {
-                    successMessage.classList.add('show');
-                }, 100);
 
-                setTimeout(() => {
-                    successMessage.classList.remove('show');
-                    setTimeout(() => {
-                        document.body.removeChild(successMessage);
-                    }, 300);
-                }, 2000);
-            });
-        });
-    }
+
 
     // Back to Top Button
     const backToTopBtn = document.querySelector('.back-to-top');

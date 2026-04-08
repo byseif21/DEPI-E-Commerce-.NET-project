@@ -1,9 +1,9 @@
-﻿@model Styleza.Models.ShopViewModel
+@model Styleza.Models.ShopViewModel
 @{
     ViewData["Title"] = "Shop";
 	Layout = "~/Views/Shared/_Layout.cshtml";
     @section Styles {
-        <link rel="stylesheet" href="~/css/shop.css" />
+        <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
     }
 }
 <!-- Page Header -->
@@ -204,7 +204,7 @@
 </section>
 @section Scripts {
         <script src="~/js/shop.js"></script>
-        <script>
+    <script>
     // Update filter (colors, sizes, tags)
     function updateFilter(type, value, element) {
         element.classList.toggle('active');
@@ -238,11 +238,5 @@
         urlParams.set('page', page);
         window.location.href = '@Url.Action("Shop", "Products")?' + urlParams.toString();
     }
-
-    // Retain existing JavaScript from template
-    document.addEventListener('DOMContentLoaded', function () {
-        // Keep all existing JS logic for client-side interactions
-        @Html.Raw(System.IO.File.ReadAllText(System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/js/shop.js")))
-    });
-</script>
+    </script>
 }
