@@ -999,7 +999,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // Call new functions
-    initProductRatings();
+    // initProductRatings(); // Disabled in favor of real backend ratings
     initSearchFunctionality();
     handleOutOfStock();
 

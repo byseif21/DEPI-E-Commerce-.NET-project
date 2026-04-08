@@ -28,6 +28,9 @@ namespace Styleza.Models
         [Range(0, 10000, ErrorMessage = "Stock quantity must be between 0 and 10000")]
         public int StockQuantity { get; set; }
 
+        public double AverageRating { get; set; } = 0;
+        public int ReviewCount { get; set; } = 0;
+
         [Required(ErrorMessage = "Category is required")]
         [Range(1, int.MaxValue, ErrorMessage = "Please select a valid category")]
         public int CategoryId { get; set; }

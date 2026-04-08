@@ -163,6 +163,8 @@ namespace Styleza.Controllers
                 existingProduct.Color = product.Color;
                 existingProduct.Tags = product.Tags;
                 existingProduct.OldPrice = product.OldPrice;
+                existingProduct.AverageRating = product.AverageRating;
+                existingProduct.ReviewCount = product.ReviewCount;
                 
                 // Boolean status flags
                 existingProduct.IsInStock = product.IsInStock;

@@ -85,6 +85,23 @@
                             <input asp-for="Tags" class="admin-form-control" placeholder="Separate tags with commas" />
                             <span asp-validation-for="Tags" class="text-danger"></span>
                         </div>
+
+                        <div class="admin-row">
+                            <div class="admin-col-6">
+                                <div class="admin-form-group">
+                                    <label asp-for="AverageRating" class="admin-form-label">Avg Rating (0-5)</label>
+                                    <input asp-for="AverageRating" class="admin-form-control" type="number" step="0.1" min="0" max="5" value="0" />
+                                    <span asp-validation-for="AverageRating" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="admin-col-6">
+                                <div class="admin-form-group">
+                                    <label asp-for="ReviewCount" class="admin-form-label">Review Count</label>
+                                    <input asp-for="ReviewCount" class="admin-form-control" type="number" min="0" value="0" />
+                                    <span asp-validation-for="ReviewCount" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
                         
                         <div class="admin-form-group">
                             <label asp-for="StockQuantity" class="admin-form-label">Stock Quantity</label>
