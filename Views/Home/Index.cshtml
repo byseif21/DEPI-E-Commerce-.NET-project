@@ -304,8 +304,12 @@
                                 window.showNotification(data.message || 'Added to cart!');
                             }
                         } else {
-                            if (data.message && data.message.includes('login')) {
-                                window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                            if (data.message && data.message.toLowerCase().includes('login')) {
+                                if (typeof window.showLoginModal === 'function') {
+                                    window.showLoginModal();
+                                } else {
+                                    window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                                }
                             } else if (typeof window.showNotification === 'function') {
                                 window.showNotification(data.message || 'Error adding to cart');
                             }

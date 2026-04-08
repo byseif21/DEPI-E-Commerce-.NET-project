@@ -27,8 +27,8 @@ namespace Styleza.Controllers
             if (_signInManager.IsSignedIn(User))
                 return RedirectToAction("Index", "Home");
             
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
+            // Redirect to Home with a login flag to trigger the modal instead of showing the page
+            return RedirectToAction("Index", "Home", new { login = "true", returnUrl = returnUrl });
         }
         
         [HttpPost]
@@ -263,6 +263,13 @@ namespace Styleza.Controllers
             }
 
             return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
         }
     }
 }

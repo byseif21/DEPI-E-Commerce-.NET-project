@@ -201,7 +201,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     
 
                 } else {
-                    showNotification(data.message || 'Failed to add item to cart');
+                    if (data.message && data.message.toLowerCase().includes('login')) {
+                        showLoginModal();
+                    } else {
+                        showNotification(data.message || 'Failed to add item to cart');
+                    }
                 }
             })
             .catch(error => {

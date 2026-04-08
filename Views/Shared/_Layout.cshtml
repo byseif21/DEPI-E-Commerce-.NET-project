@@ -1,4 +1,4 @@
-@using Microsoft.AspNetCore.Identity
+﻿@using Microsoft.AspNetCore.Identity
 @using Styleza.Data
 @using Styleza.Models
 @inject SignInManager<IdentityUser> SignInManager
@@ -180,13 +180,13 @@
                         <span class="cart-count">@cartCount</span>
                     </div>
                     <div class="nav-icon">
-                        <a asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">Logout</a>
+                        <a href="javascript:void(0);" onclick="showLogoutModal(); return false;" title="Logout"><i class="fas fa-sign-out-alt"></i></a>
                     </div>
                 }
                 else
                 {
                     <div class="nav-icon">
-                        <a asp-controller="Account" asp-action="Login"><i class="far fa-user"></i></a>
+                        <a href="javascript:void(0);" onclick="showLoginModal(); return false;" title="Login"><i class="far fa-user"></i></a>
                     </div>
                     <div class="nav-icon">
                         <a asp-controller="Home" asp-action="Wishlist"><i class="far fa-heart"></i></a>
@@ -266,13 +266,13 @@
                         <a asp-controller="Home" asp-action="Wishlist" class="mobile-nav-link"><i class="far fa-heart me-2"></i>Wishlist</a>
                     </li>
                     <li class="mobile-nav-item">
-                        <a asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" class="mobile-nav-link"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+                        <a href="javascript:void(0);" onclick="showLogoutModal(); return false;" class="mobile-nav-link"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
                     </li>
                 }
                 else
                 {
                     <li class="mobile-nav-item">
-                        <a asp-controller="Account" asp-action="Login" class="mobile-nav-link">Login</a>
+                        <a href="javascript:void(0);" onclick="showLoginModal(); return false;" class="mobile-nav-link">Login</a>
                     </li>
                     <li class="mobile-nav-item">
                         <a asp-controller="Account" asp-action="Register" class="mobile-nav-link">Register</a>
@@ -304,6 +304,60 @@
     <script src="~/js/error-handler.js"></script>
 
     @RenderSection("Scripts", required: false)
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="auth-modal-overlay">
+        <div class="auth-modal-container">
+            <div class="auth-modal-close" onclick="closeLoginModal()"><i class="fas fa-times"></i></div>
+            <div class="account-form-container">
+                <h2>Welcome Back</h2>
+                <p class="subtitle">Please enter your details to sign in</p>
+                
+                <form id="modal-login-form" method="post" asp-controller="Account" asp-action="Login">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input name="Email" type="email" class="form-control" placeholder="name@example.com" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input name="Password" type="password" class="form-control" placeholder="••••••••" required />
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            <input name="RememberMe" type="checkbox" value="true" />
+                            <span class="checkmark"></span>
+                            <span>Remember Me</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn-login">Sign In</button>
+                    <div class="form-footer">
+                        <a href="@Url.Action("ForgotPassword", "Account")">Forgot password?</a>
+                        <p style="color: rgba(255,255,255,0.5); font-size: 14px; margin-top: 15px;">
+                            Don't have an account? <a href="@Url.Action("Register", "Account")" style="color: var(--secondary); margin: 0; font-weight: 600;">Register now</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logout-modal" class="auth-modal-overlay">
+        <div class="auth-modal-container confirmation-modal">
+            <div class="auth-modal-close" onclick="closeLogoutModal()"><i class="fas fa-times"></i></div>
+            <div class="account-form-container">
+                <h2>Ready to leave?</h2>
+                <p class="subtitle">Are you sure you want to log out of your account?</p>
+                <div class="modal-actions">
+                    <form asp-controller="Account" asp-action="Logout" method="post">
+                        <button type="submit" class="btn-login">Yes, Logout</button>
+                    </form>
+                    <button class="btn-login cancel-btn" onclick="closeLogoutModal()" style="background: rgba(255,255,255,0.1); margin-top: 15px;">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
 </body>

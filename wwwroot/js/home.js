@@ -21,17 +21,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (searchToggle && searchOverlay && searchClose) {
         searchToggle.addEventListener('click', () => {
-            searchOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            setTimeout(() => {
-                const searchInput = document.querySelector('.search-form input');
-                if (searchInput) searchInput.focus();
-            }, 300);
+            searchOverlay.classList.toggle('active');
+            if (searchOverlay.classList.contains('active')) {
+                setTimeout(() => {
+                    const searchInput = document.querySelector('.search-form input');
+                    if (searchInput) searchInput.focus();
+                }, 300);
+            }
         });
 
         searchClose.addEventListener('click', () => {
             searchOverlay.classList.remove('active');
-            document.body.style.overflow = '';
         });
     }
 
@@ -99,7 +99,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (event.key === 'Escape') {
             if (searchOverlay && searchOverlay.classList.contains('active')) {
                 searchOverlay.classList.remove('active');
-                document.body.style.overflow = '';
             }
 
             const mobileMenuEsc = document.querySelector('.mobile-menu');
@@ -401,3 +400,72 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 });
+
+// Authentication Modals
+function showLoginModal() {
+    const modal = document.getElementById('login-modal');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeLoginModal() {
+    const modal = document.getElementById('login-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+function showLogoutModal() {
+    const modal = document.getElementById('logout-modal');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeLogoutModal() {
+    const modal = document.getElementById('logout-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+// Global click handlers for modals
+document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('auth-modal-overlay')) {
+        closeLoginModal();
+        closeLogoutModal();
+    }
+});
+
+// Global escape key handler
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeLoginModal();
+        closeLogoutModal();
+        
+        const searchOverlay = document.querySelector('.search-overlay');
+        if (searchOverlay && searchOverlay.classList.contains('active')) {
+            searchOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+});
+
+// Check for login flag in URL to auto-open modal (on page load)
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('login') === 'true') {
+        setTimeout(showLoginModal, 500); // Small delay to ensure styles are loaded
+    }
+});
+
+// Expose to window for inline onclicks
+window.showLoginModal = showLoginModal;
+window.closeLoginModal = closeLoginModal;
+window.showLogoutModal = showLogoutModal;
+window.closeLogoutModal = closeLogoutModal;
