@@ -161,6 +161,16 @@ namespace Styleza.Controllers
                 existingProduct.CategoryId = product.CategoryId;
                 existingProduct.StockQuantity = product.StockQuantity;
                 existingProduct.Color = product.Color;
+                existingProduct.Tags = product.Tags;
+                existingProduct.OldPrice = product.OldPrice;
+                
+                // Boolean status flags
+                existingProduct.IsInStock = product.IsInStock;
+                existingProduct.IsNew = product.IsNew;
+                existingProduct.IsBestSeller = product.IsBestSeller;
+                
+                // Auto-set IsOnSale if OldPrice is present and greater than current price
+                existingProduct.IsOnSale = product.IsOnSale || (product.OldPrice.HasValue && product.OldPrice > product.Price);
 
                 // Handle file upload
                 if (ProductImage != null && ProductImage.Length > 0)
@@ -283,6 +293,12 @@ namespace Styleza.Controllers
                 // Generate a collision-safe ProductId
                 product.ProductId = Math.Abs(Guid.NewGuid().GetHashCode());
                 product.Id = 0; // Ensure it's treated as a new product
+
+                // Auto-set IsOnSale if OldPrice is present
+                if (product.OldPrice.HasValue && product.OldPrice > product.Price)
+                {
+                    product.IsOnSale = true;
+                }
 
                 // Handle file upload
                 if (ProductImage != null && ProductImage.Length > 0)

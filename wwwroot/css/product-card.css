@@ -1,4 +1,4 @@
-﻿.product-card {
+.product-card {
     background-color: white;
     border-radius: 10px;
     overflow: hidden;
@@ -113,6 +113,14 @@
 
     .add-to-cart:hover {
         background-color: var(--secondary);
+    }
+
+    .add-to-cart.disabled {
+        background-color: #d1d1d1 !important;
+        color: #777 !important;
+        cursor: not-allowed !important;
+        pointer-events: none;
+        border: none !important;
     }
 
 .product-card:hover {

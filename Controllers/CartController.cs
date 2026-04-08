@@ -59,6 +59,25 @@ namespace Styleza.Controllers
                     return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Index", "Home") });
                 }
 
+                // Check stock availability
+                var product = await _context.Products.FindAsync(productId);
+                if (product == null)
+                {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                        return Json(new { success = false, message = "Product not found" });
+                    return NotFound();
+                }
+
+                if (!product.IsInStock || product.StockQuantity < quantity)
+                {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        string stockMsg = !product.IsInStock ? "This product is currently out of stock." : $"Only {product.StockQuantity} items in stock.";
+                        return Json(new { success = false, message = stockMsg });
+                    }
+                    return BadRequest("Product is out of stock.");
+                }
+
                 // Get or create cart
                 var cart = await _context.Carts.FirstOrDefaultAsync(c => c.UserId == userId);
                 if (cart == null)
@@ -94,7 +113,6 @@ namespace Styleza.Controllers
                 // If it's an AJAX request, return JSON result
                 if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 {
-                    var product = await _context.Products.FindAsync(productId);
                     var count = await _context.CartItems
                         .Where(ci => ci.CartId == cart.Id)
                         .SumAsync(ci => ci.Quantity);
