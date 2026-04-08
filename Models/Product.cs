@@ -29,6 +29,7 @@ namespace Styleza.Models
         public int StockQuantity { get; set; }
 
         [Required(ErrorMessage = "Category is required")]
+        [Range(1, int.MaxValue, ErrorMessage = "Please select a valid category")]
         public int CategoryId { get; set; }
 
         public decimal? OldPrice { get; set; }

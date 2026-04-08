@@ -83,9 +83,10 @@
         <div class="products-grid">
             @foreach (var product in Model)
             {
+                var placeholderImage = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'><rect width='400' height='400' fill='%23f5f5f5'/><path d='M120 260l55-70 45 55 35-45 65 60H120z' fill='%23d0d0d0'/><circle cx='155' cy='145' r='22' fill='%23d0d0d0'/></svg>";
                 var primaryImage = product.Images.FirstOrDefault(i => i.IsPrimary)?.ImageUrl 
                                 ?? product.ImageUrl 
-                                ?? "/asset/img/placeholder.png";
+                                ?? placeholderImage;
                 var label = product.OldPrice > 0 ? "Sale" : (product.StockQuantity > 0 ? "New" : "Hot");
                 <div class="product-card">
                     <div class="product-img-container">
