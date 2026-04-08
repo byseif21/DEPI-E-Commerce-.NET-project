@@ -314,106 +314,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Add to Cart Animation
-    // Add to Cart Functionality (AJAX)
-    const addToCartButtons = document.querySelectorAll('.add-to-cart');
-    const cartIconItem = document.querySelector('.cart-icon');
-
-    if (addToCartButtons.length > 0) {
-        addToCartButtons.forEach(button => {
-            button.addEventListener('click', function (e) {
-                e.preventDefault();
-                
-                if (this.classList.contains('disabled')) return;
-
-                let productId = this.dataset.productId || this.getAttribute('data-product-id');
-                if (!productId) {
-                    const href = this.getAttribute('href');
-                    if (href) {
-                        const productUrl = new URL(href, window.location.origin);
-                        productId = productUrl.searchParams.get('productId');
-                    }
-                }
-                productId = productId ? productId.trim() : '';
-                
-                if (!productId || Number.isNaN(Number(productId))) {
-                    console.error('Could not determine product ID');
-                    return;
-                }
-
-                // Show loader for the duration of the AJAX call
-                if (typeof window.showLoader === 'function') window.showLoader('add_to_cart_ajax');
-
-                fetch(`/Cart/AddToCart?productId=${productId}&quantity=1`, {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (typeof window.hideLoader === 'function') window.hideLoader('add_to_cart_done');
-
-                    if (data.success) {
-                        // Update cart count
-                        const cartCountElements = document.querySelectorAll('.cart-count');
-                        cartCountElements.forEach(el => {
-                            el.textContent = data.cartCount;
-                        });
-
-                        // Animation
-                        if (cartIconItem) {
-                            cartIconItem.classList.add('pulse');
-                            setTimeout(() => {
-                                cartIconItem.classList.remove('pulse');
-                            }, 500);
-                        }
-
-                        showNotification(data.message || 'Added to cart!');
-                    } else {
-                        console.warn('[Styleza Debug] Server returned failure:', data.message);
-                        // If not logged in or other error, redirect to login or show error
-                        if (data.message && data.message.includes('login')) {
-                            window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
-                        } else {
-                            showNotification(data.message || 'Error adding to cart', 'error');
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('[Styleza Debug] Fetch error:', error);
-                    if (typeof window.hideLoader === 'function') window.hideLoader('add_to_cart_error');
-                    showNotification('An error occurred. Please try again.', 'error');
-                });
-            });
-        });
-    }
 
 
 
-    // Helper to show notifications
-    function showNotification(message, type = 'success') {
-        const existing = document.querySelector('.add-to-cart-success');
-        if (existing) existing.remove();
 
-        const successMessage = document.createElement('div');
-        successMessage.className = 'add-to-cart-success' + (type === 'error' ? ' error' : '');
-        successMessage.textContent = message;
-        document.body.appendChild(successMessage);
 
-        setTimeout(() => {
-            successMessage.classList.add('show');
-        }, 100);
 
-        setTimeout(() => {
-            successMessage.classList.remove('show');
-            setTimeout(() => {
-                if (successMessage.parentElement) {
-                    document.body.removeChild(successMessage);
-                }
-            }, 300);
-        }, 2500);
-    }
+
 
     // Back to Top Button
     const backToTopBtn = document.querySelector('.back-to-top');

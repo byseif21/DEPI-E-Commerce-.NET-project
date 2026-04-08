@@ -189,8 +189,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
     
-    // Show notification
-    function showNotification(message) {
+    // Show notification (Global)
+    window.showNotification = function(message) {
         // Remove existing notification if any
         if (document.querySelector('.notification')) {
             document.querySelector('.notification').remove();
