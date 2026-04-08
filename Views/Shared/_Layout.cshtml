@@ -259,9 +259,15 @@
                 </li>
                 @if (SignInManager.IsSignedIn(User))
                 {
-                    <a asp-area="Identity" asp-page="/Account/Manage/Index"><i class="far fa-user"></i> My Account</a>
-                    <a asp-controller="Home" asp-action="Wishlist"><i class="far fa-heart"></i> Wishlist</a>
-                    <a asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    <li class="mobile-nav-item">
+                        <a asp-area="Identity" asp-page="/Account/Manage/Index" class="mobile-nav-link"><i class="far fa-user me-2"></i>My Account</a>
+                    </li>
+                    <li class="mobile-nav-item">
+                        <a asp-controller="Home" asp-action="Wishlist" class="mobile-nav-link"><i class="far fa-heart me-2"></i>Wishlist</a>
+                    </li>
+                    <li class="mobile-nav-item">
+                        <a asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" class="mobile-nav-link"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+                    </li>
                 }
                 else
                 {

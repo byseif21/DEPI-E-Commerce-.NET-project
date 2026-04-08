@@ -28,9 +28,11 @@ const StylezaErrorHandler = {
             if (xhr.responseJSON.errors) {
                 const errors = xhr.responseJSON.errors;
                 if (typeof errors === 'object') {
-                    // If we have a form, display field-specific errors
+                    // If we have a form, display field-specific errors when validation is available
                     if (container && container.tagName === 'FORM') {
-                        StylezaValidation.displayServerErrors(errors, container);
+                        if (window.StylezaValidation?.displayServerErrors) {
+                            window.StylezaValidation.displayServerErrors(errors, container);
+                        }
                         return;
                     }
                     
