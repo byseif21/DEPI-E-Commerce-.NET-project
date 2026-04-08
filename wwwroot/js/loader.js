@@ -65,14 +65,19 @@
             
             // Ignore if not a link or has no href
             if (!link || !link.href) return;
+
+            // Ignore modifier-key navigation (opens in new tab/window, doesn't navigate current page)
+            if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
             
             const href = link.getAttribute('href');
             
-            // IGNORE MOCK LINKS (This fixes the 'Collections' menu issue)
+            // IGNORE MOCK LINKS, non-HTTP schemes (mailto:, tel:, etc.) and same-page links
             if (!href || 
                 href === '#' || 
                 href.startsWith('#') || 
-                href.startsWith('javascript:') || 
+                href.startsWith('javascript:') ||
+                href.startsWith('mailto:') ||
+                href.startsWith('tel:') ||
                 link.classList.contains('no-loader') ||
                 link.getAttribute('target') === '_blank') {
                 return;

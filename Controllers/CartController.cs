@@ -40,6 +40,13 @@ namespace Styleza.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToCart(int productId, int quantity = 1)
         {
+            if (quantity < 1)
+            {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    return Json(new { success = false, message = "Invalid quantity" });
+                return BadRequest("Invalid quantity");
+            }
+
             try
             {
                 var userId = _userManager.GetUserId(User);

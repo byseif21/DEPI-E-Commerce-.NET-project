@@ -250,3 +250,6 @@ document.addEventListener('DOMContentLoaded', function() {
         );
     }
 });
+
+// Explicitly expose to window for cross-script access
+window.StylezaValidation = StylezaValidation;
