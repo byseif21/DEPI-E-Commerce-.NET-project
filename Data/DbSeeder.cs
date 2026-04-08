@@ -37,10 +37,20 @@ namespace Styleza.Data
                     EmailConfirmed = true
                 };
 
-                await userManager.CreateAsync(adminUser, adminPassword);
+                var result = await userManager.CreateAsync(adminUser, adminPassword);
+                if (!result.Succeeded)
+                {
+                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    throw new Exception($"Failed to seed admin user: {errors}");
+                }
                 
                 // Add the user to the Admin role
-                await userManager.AddToRoleAsync(adminUser, "Admin");
+                var roleResult = await userManager.AddToRoleAsync(adminUser, "Admin");
+                if (!roleResult.Succeeded)
+                {
+                    var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                    throw new Exception($"Failed to assign Admin role: {errors}");
+                }
             }
             else if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
             {

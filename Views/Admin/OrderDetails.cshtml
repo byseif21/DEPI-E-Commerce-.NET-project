@@ -120,10 +120,14 @@
                         <div class="admin-form-group">
                             <label for="status" class="admin-form-label">Status</label>
                             <select name="status" id="status" class="admin-form-select">
-                                <option value="Processing" @(Model.Status == "Processing" ? "selected" : "")>Processing</option>
-                                <option value="Shipped" @(Model.Status == "Shipped" ? "selected" : "")>Shipped</option>
-                                <option value="Completed" @(Model.Status == "Completed" ? "selected" : "")>Completed</option>
-                                <option value="Cancelled" @(Model.Status == "Cancelled" ? "selected" : "")>Cancelled</option>
+                                @if (Model.Status == "Processing") { <option value="Processing" selected>Processing</option> }
+                                else { <option value="Processing">Processing</option> }
+                                @if (Model.Status == "Shipped") { <option value="Shipped" selected>Shipped</option> }
+                                else { <option value="Shipped">Shipped</option> }
+                                @if (Model.Status == "Completed") { <option value="Completed" selected>Completed</option> }
+                                else { <option value="Completed">Completed</option> }
+                                @if (Model.Status == "Cancelled") { <option value="Cancelled" selected>Cancelled</option> }
+                                else { <option value="Cancelled">Cancelled</option> }
                             </select>
                         </div>
                         <button type="submit" class="admin-btn admin-btn-primary"><i class="fas fa-sync-alt me-2"></i>Update Status</button>
