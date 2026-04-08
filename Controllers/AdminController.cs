@@ -151,6 +151,21 @@ namespace Styleza.Controllers
 
             try
             {
+                // Fetch existing product from the database to preserve non-form fields
+                var existingProduct = await _context.Products.FindAsync(product.Id);
+                if (existingProduct == null)
+                {
+                    return NotFound();
+                }
+
+                // Update only the fields that are present in the form
+                existingProduct.Name = product.Name;
+                existingProduct.Description = product.Description;
+                existingProduct.Price = product.Price;
+                existingProduct.CategoryId = product.CategoryId;
+                existingProduct.StockQuantity = product.StockQuantity;
+                existingProduct.Color = product.Color;
+
                 // Handle file upload
                 if (ProductImage != null && ProductImage.Length > 0)
                 {
@@ -180,11 +195,11 @@ namespace Styleza.Controllers
                             await ProductImage.CopyToAsync(fileStream);
                         }
                         
-                        product.ImageUrl = $"/asset/img/products/{fileName}";
+                        existingProduct.ImageUrl = $"/asset/img/products/{fileName}";
                         
                         // Update the images collection
                         var existingImages = await _context.ProductImages
-                            .Where(i => i.ProductId == product.Id)
+                            .Where(i => i.ProductId == existingProduct.Id)
                             .ToListAsync();
                             
                         // Mark existing primary images as non-primary
@@ -196,8 +211,8 @@ namespace Styleza.Controllers
                         // Add new primary image
                         _context.ProductImages.Add(new ProductImage
                         {
-                            ImageUrl = product.ImageUrl,
-                            ProductId = product.Id,
+                            ImageUrl = existingProduct.ImageUrl,
+                            ProductId = existingProduct.Id,
                             IsPrimary = true
                         });
                     }
@@ -208,15 +223,20 @@ namespace Styleza.Controllers
                         return View(product);
                     }
                 }
+                else
+                {
+                    // If no new image was uploaded, preserve the existing one in the returned model (for the view on error)
+                    product.ImageUrl = existingProduct.ImageUrl;
+                }
                 
-                _context.Update(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(ProductManagement));
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error updating product: {ex.Message}");
-                ModelState.AddModelError("", $"A database error occurred: {ex.Message}");
+                var fullError = ex.Message + (ex.InnerException != null ? " | Inner: " + ex.InnerException.Message : "");
+                Console.WriteLine($"Error updating product: {fullError}");
+                ModelState.AddModelError("", $"A database error occurred: {fullError}");
                 ViewBag.Categories = await _context.Categories.ToListAsync();
                 return View(product);
             }

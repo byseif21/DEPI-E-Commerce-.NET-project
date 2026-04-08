@@ -14,6 +14,7 @@
         <div class="admin-card-body">
             <form asp-action="CreateProduct" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="ProductId" />
                 <partial name="_ErrorMessagePartial" />
                 
                 <div class="admin-row">
