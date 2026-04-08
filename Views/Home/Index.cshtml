@@ -114,7 +114,10 @@
                                 <div class="old-price">$@product.OldPrice.Value.ToString("F2")</div>
                             }
                         </div>
-                        <a asp-controller="Cart" asp-action="AddToCart" asp-route-productId="@product.Id" class="add-to-cart">Add to Cart</a>
+                        <form asp-controller="Cart" asp-action="AddToCart" method="post" class="ajax-cart-form">
+                            <input type="hidden" name="productId" value="@product.Id" />
+                            <button type="submit" class="add-to-cart" style="border: none; cursor: pointer; width: 100%;">Add to Cart</button>
+                        </form>
                     </div>
                 </div>
             }
@@ -265,6 +268,48 @@
             }
 
             startCountdown();
+
+            // Handle AJAX Cart Submission
+            document.querySelectorAll('.ajax-cart-form').forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    const productId = formData.get('productId');
+
+                    if (typeof window.showLoader === 'function') window.showLoader('home_cart_add');
+
+                    fetch('/Cart/AddToCart', {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (typeof window.hideLoader === 'function') window.hideLoader('home_cart_done');
+
+                        if (data.success) {
+                            // Update cart count globals
+                            document.querySelectorAll('.cart-count').forEach(el => el.textContent = data.cartCount);
+                            
+                            // Show the global notification from cart.js
+                            if (typeof window.showNotification === 'function') {
+                                window.showNotification(data.message || 'Added to cart!');
+                            }
+                        } else {
+                            if (data.message && data.message.includes('login')) {
+                                window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                            } else if (typeof window.showNotification === 'function') {
+                                window.showNotification(data.message || 'Error adding to cart');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        if (typeof window.hideLoader === 'function') window.hideLoader('home_cart_error');
+                        console.error('Home Cart Error:', error);
+                    });
+                });
+            });
         });
     </script>
 }
