@@ -61,6 +61,7 @@ namespace Styleza.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignAdminRole(string userId)
         {
             if (string.IsNullOrEmpty(userId))
@@ -90,6 +91,7 @@ namespace Styleza.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveAdminRole(string userId)
         {
             if (string.IsNullOrEmpty(userId))
@@ -169,6 +171,13 @@ namespace Styleza.Controllers
                 // Handle file upload
                 if (ProductImage != null && ProductImage.Length > 0)
                 {
+                    if (ProductImage.Length > 5 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError("ProductImage", "File size cannot exceed 5MB.");
+                        ViewBag.Categories = await _context.Categories.ToListAsync();
+                        return View(product);
+                    }
+
                     var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
                     var fileExtension = Path.GetExtension(ProductImage.FileName).ToLowerInvariant();
                     
@@ -284,6 +293,13 @@ namespace Styleza.Controllers
                 // Handle file upload
                 if (ProductImage != null && ProductImage.Length > 0)
                 {
+                    if (ProductImage.Length > 5 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError("ProductImage", "File size cannot exceed 5MB.");
+                        ViewBag.Categories = await _context.Categories.ToListAsync();
+                        return View(product);
+                    }
+
                     var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
                     var fileExtension = Path.GetExtension(ProductImage.FileName).ToLowerInvariant();
                     
@@ -402,8 +418,16 @@ namespace Styleza.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateOrderStatus(int id, string status)
         {
+            // Validate order status against whitelist to prevent persistence of arbitrary strings
+            var validStatuses = new[] { "Processing", "Shipped", "Delivered", "Cancelled" };
+            if (!validStatuses.Contains(status))
+            {
+                return BadRequest("Invalid order status");
+            }
+
             var order = await _context.Orders.FindAsync(id);
             if (order != null)
             {

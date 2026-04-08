@@ -71,8 +71,10 @@ const StylezaValidation = {
         // Only clear our custom error messages, not ASP.NET ones
         const errorMessages = form.querySelectorAll('[data-valmsg-for]:not([data-valmsg-replace])');
         errorMessages.forEach(el => {
-            el.textContent = '';
-            el.style.display = 'none';
+            if (el.getAttribute('data-val') !== 'true') {
+                el.textContent = '';
+                el.style.display = 'none';
+            }
         });
         
         // Apply validation rules

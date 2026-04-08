@@ -109,7 +109,7 @@ namespace Styleza.Controllers
 
                 if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 {
-                    return Json(new { success = false, message = "Database Error: " + fullError });
+                    return Json(new { success = false, message = "Failed to add item to cart. Please try again later." });
                 }
                 throw;
             }
