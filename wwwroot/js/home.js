@@ -326,11 +326,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 if (this.classList.contains('disabled')) return;
 
-                const productId = this.getAttribute('data-product-id') || 
-                                 this.getAttribute('href')?.split('productId=')[1] ||
-                                 this.getAttribute('href')?.split('/').pop();
+                let productId = this.dataset.productId || this.getAttribute('data-product-id');
+                if (!productId) {
+                    const href = this.getAttribute('href');
+                    if (href) {
+                        const productUrl = new URL(href, window.location.origin);
+                        productId = productUrl.searchParams.get('productId');
+                    }
+                }
+                productId = productId ? productId.trim() : '';
                 
-                if (!productId || isNaN(productId)) {
+                if (!productId || Number.isNaN(Number(productId))) {
                     console.error('Could not determine product ID');
                     return;
                 }
