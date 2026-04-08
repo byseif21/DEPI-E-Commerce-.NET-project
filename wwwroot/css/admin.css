@@ -347,3 +347,29 @@
 .admin-mb-4 { margin-bottom: 1.5rem; }
 .admin-mb-5 { margin-bottom: 3rem; }
 .admin-mt-3 { margin-top: 1rem; }
+
+.admin-table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.admin-flex {
+    display: flex;
+}
+
+.admin-align-center {
+    align-items: center;
+}
+
+.admin-product-thumbnail {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.admin-text-end {
+    text-align: right;
+}
