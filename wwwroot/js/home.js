@@ -389,16 +389,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Expose showMiniCart to window so it can be called from onclick handlers
-    window.showMiniCart = function() {
-        // If mini-cart already exists, don't create another one
-        if (document.querySelector('.mini-cart')) return;
-        
-        // Create mini-cart element
-        const miniCart = document.createElement('div');
-        miniCart.className = 'mini-cart';
-        document.body.appendChild(miniCart);
-    };
+
 
     // Helper to show notifications
     function showNotification(message, type = 'success') {
