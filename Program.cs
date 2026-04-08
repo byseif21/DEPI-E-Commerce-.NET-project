@@ -54,7 +54,12 @@ using (var scope = app.Services.CreateScope())
     var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
     
     await Styleza.Data.DbSeeder.SeedRolesAsync(roleManager);
-    await Styleza.Data.DbSeeder.SeedDefaultAdminAsync(userManager, roleManager);
+    
+    // Security: Only seed the default admin account in development environments
+    if (app.Environment.IsDevelopment())
+    {
+        await Styleza.Data.DbSeeder.SeedDefaultAdminAsync(userManager, roleManager);
+    }
 }
 
 app.Run();
