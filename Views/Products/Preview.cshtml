@@ -1,4 +1,4 @@
-﻿@model Styleza.Models.Product
+@model Styleza.Models.Product
 @{
     ViewData["Title"] = @Model.Name;
 }
@@ -56,7 +56,7 @@
                 </div>
                 <div class="product-actions">
                     <button class="add-to-cart-btn" data-product-id="@Model.Id" @(Model.IsInStock ? "" : "disabled")>Add to Cart</button>
-                    <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                    <button class="wishlist-btn" data-product-id="@Model.Id"><i class="far fa-heart"></i></button>
                     <button class="compare-btn"><i class="fas fa-sync-alt"></i></button>
                 </div>
                 <div class="product-info-extra">

@@ -1,48 +1,60 @@
-﻿@model List<Styleza.Models.Wishlist>
+@model List<Styleza.Models.Wishlist>
 
 @{
     ViewData["Title"] = "My Wishlist";
 }
 
-<section class="section">
+@section Styles {
+    <link rel="stylesheet" href="~/css/wishlist.css" />
+}
+
+<div class="wishlist-page">
     <div class="container">
-        <h2>My Wishlist</h2>
+        <div class="wishlist-header">
+            <h1>My Wishlist</h1>
+            <p>Keep track of the items you love across our collection</p>
+        </div>
 
         @if (Model == null || !Model.Any())
         {
-            <p>Your wishlist is empty.</p>
-            <div class="empty-wishlist-actions">
-                <a href="/Products/Shop" class="btn btn-primary">Continue Shopping</a>
+            <div class="empty-wishlist">
+                <i class="far fa-heart"></i>
+                <h2>Your Wishlist is Empty</h2>
+                <p>Seems like you haven't added anything to your wishlist yet. Explore our shop and find something you'll love!</p>
+                <div class="empty-wishlist-actions">
+                    <a asp-controller="Products" asp-action="Shop" class="btn-continue-shopping">Continue Shopping</a>
+                </div>
             </div>
         }
         else
         {
-            <div class="products-grid">
+            <div class="wishlist-grid">
                 @foreach (var item in Model)
                 {
                     <div class="product-card" data-product-id="@item.ProductId">
-                        <div class="product-card-actions">
-                            <button class="remove-from-wishlist" data-id="@item.Id">
+                        <div class="product-img-container">
+                             <button class="remove-from-wishlist" data-id="@item.Id" title="Remove from wishlist">
                                 <i class="fas fa-times"></i>
                             </button>
+                            <a asp-controller="Products" asp-action="Preview" asp-route-id="@item.ProductId">
+                                <img src="@(item.Product?.Images?.FirstOrDefault(i => i.IsPrimary)?.ImageUrl ?? "/asset/img/default-product.png")"
+                                     alt="@item.Product?.Name" class="product-img" />
+                            </a>
                         </div>
-                        <a href="/Products/Preview/@item.ProductId">
-                            <img src="@item.Product?.Images?.FirstOrDefault(i => i.IsPrimary)?.ImageUrl ?? "/images/default.jpg""
-                                alt="@item.Product?.Name ?? "Product"" />
-                        </a>
-                        <h3><a href="/Products/Preview/@item.ProductId">@item.Product?.Name ?? "Unknown Product"</a></h3>
-                        <p class="product-price">
-                            @if (item.Product != null)
-                            {
-                                @item.Product.Price.ToString("C2")
-                            }
-                            else
-                            {
-                                <span>Price not available</span>
-                            }
-                        </p>
-                        <div class="product-card-footer">
-                            <button class="add-to-cart-btn" data-product-id="@item.ProductId">
+                        
+                        <div class="product-info">
+                            <h3 class="product-title"><a asp-controller="Products" asp-action="Preview" asp-route-id="@item.ProductId">@item.Product?.Name</a></h3>
+                            <div class="product-price">
+                                @if (item.Product != null)
+                                {
+                                    <span class="current-price">@item.Product.Price.ToString("C2")</span>
+                                }
+                                else
+                                {
+                                    <span class="current-price">Price N/A</span>
+                                }
+                            </div>
+                            <button class="add-to-cart add-to-cart-btn" data-product-id="@item.ProductId">
                                 <i class="fas fa-shopping-cart"></i> Add to Cart
                             </button>
                         </div>
@@ -51,98 +63,105 @@
             </div>
         }
     </div>
-</section>
+</div>
+
 
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Handle remove from wishlist
             document.querySelectorAll('.remove-from-wishlist').forEach(btn => {
-                btn.addEventListener('click', async function() {
+                btn.addEventListener('click', async function(e) {
+                    e.preventDefault();
                     const id = this.dataset.id;
                     const productCard = this.closest('.product-card');
                     
                     try {
-                        const response = await fetch('/Home/RemoveFromWishlist', {
+                        const response = await fetch(`/Home/RemoveFromWishlist?wishlistItemId=${id}`, {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: JSON.stringify({ wishlistItemId: parseInt(id) })
+                            }
                         });
                         
                         if (response.ok) {
-                            productCard.remove();
+                            productCard.style.opacity = '0';
+                            productCard.style.transform = 'scale(0.8)';
                             
-                            // Check if there are any items left
-                            if (document.querySelectorAll('.product-card').length === 0) {
-                                const container = document.querySelector('.container');
-                                container.innerHTML = `
-                                    <h2>My Wishlist</h2>
-                                    <p>Your wishlist is empty.</p>
-                                    <div class="empty-wishlist-actions">
-                                        <a href="/Products/Shop" class="btn btn-primary">Continue Shopping</a>
-                                    </div>
-                                `;
+                            setTimeout(() => {
+                                productCard.remove();
+                                
+                                // Check if there are any items left
+                                if (document.querySelectorAll('.product-card').length === 0) {
+                                    const container = document.querySelector('.wishlist-page .container');
+                                    container.innerHTML = `
+                                        <div class="wishlist-header">
+                                            <h1>My Wishlist</h1>
+                                            <p>Keep track of the items you love across our collection</p>
+                                        </div>
+                                        <div class="empty-wishlist">
+                                            <i class="far fa-heart"></i>
+                                            <h2>Your Wishlist is Empty</h2>
+                                            <p>Seems like you haven't added anything to your wishlist yet. Explore our shop and find something you'll love!</p>
+                                            <div class="empty-wishlist-actions">
+                                                <a href="/Products/Shop" class="btn-continue-shopping">Continue Shopping</a>
+                                            </div>
+                                        </div>
+                                    `;
+                                }
+                            }, 300);
+
+                            if (typeof showNotification === 'function') {
+                                showNotification('Item removed from wishlist');
                             }
-                            
-                            showNotification('Item removed from wishlist');
                         }
                     } catch (error) {
                         console.error('Error removing item from wishlist:', error);
-                        showNotification('Failed to remove item. Please try again.');
+                        if (typeof showNotification === 'function') {
+                             showNotification('Failed to remove item. Please try again.');
+                        }
                     }
                 });
             });
             
             // Handle add to cart
             document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-                btn.addEventListener('click', async function() {
+                btn.addEventListener('click', async function(e) {
+                    e.preventDefault();
                     const productId = this.dataset.productId;
                     
                     try {
-                        const response = await fetch('/Cart/AddToCart', {
+                        const response = await fetch(`/Cart/AddToCart?productId=${productId}&quantity=1`, {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json',
                                 'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: JSON.stringify({ productId: parseInt(productId), quantity: 1 })
+                            }
                         });
                         
                         const result = await response.json();
                         if (result.success) {
-                            showNotification(result.message || 'Item added to cart');
+                            // Update cart count if exists
+                            const cartCountElements = document.querySelectorAll('.cart-count');
+                            if (cartCountElements.length > 0 && result.cartCount) {
+                                cartCountElements.forEach(el => el.textContent = result.cartCount);
+                            }
+
+                            if (typeof showNotification === 'function') {
+                                showNotification(result.message || 'Item added to cart');
+                            }
                         } else {
-                            showNotification(result.message || 'Failed to add item to cart');
+                             if (typeof showNotification === 'function') {
+                                showNotification(result.message || 'Failed to add item to cart');
+                            }
                         }
                     } catch (error) {
                         console.error('Error adding item to cart:', error);
-                        showNotification('Failed to add item to cart. Please try again.');
+                        if (typeof showNotification === 'function') {
+                            showNotification('Failed to add item to cart. Please try again.');
+                        }
                     }
                 });
             });
-            
-            // Helper function to show notifications
-            function showNotification(message) {
-                const notification = document.createElement('div');
-                notification.className = 'notification';
-                notification.textContent = message;
-                
-                document.body.appendChild(notification);
-                
-                setTimeout(() => {
-                    notification.classList.add('show');
-                }, 10);
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 300);
-                }, 3000);
-            }
         });
     </script>
 }

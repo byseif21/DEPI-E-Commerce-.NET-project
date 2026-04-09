@@ -31,13 +31,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to add item to wishlist on server
     async function addToWishlistServer(productId) {
         try {
-            const response = await fetch('/Home/AddToWishlist', {
+            const userId = document.body.classList.contains('logged-in');
+            if (!userId) {
+                showLoginModal();
+                return;
+            }
+
+            const response = await fetch(`/Home/AddToWishlist?productId=${productId}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({ productId: parseInt(productId) })
+                }
             });
             
             const result = await response.json();
@@ -162,26 +166,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-    }
-    
-    // Helper function to show notifications
-    function showNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.textContent = message;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 10);
-        
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                notification.remove();
-            }, 300);
-        }, 3000);
     }
     
     // Initialize UI

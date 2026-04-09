@@ -88,7 +88,7 @@
                                 ?? product.ImageUrl 
                                 ?? placeholderImage;
                 var label = product.OldPrice > 0 ? "Sale" : (product.StockQuantity > 0 ? "New" : "Hot");
-                <div class="product-card">
+                <div class="product-card" data-product-id="@product.Id">
                     <div class="product-img-container">
                         <img src="@primaryImage" class="product-img" alt="@product.Name">
                         <div class="product-actions">

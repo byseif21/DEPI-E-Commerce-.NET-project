@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @using Styleza.Data
 @using Styleza.Models
 @inject SignInManager<IdentityUser> SignInManager
@@ -21,13 +21,18 @@
     {
         <link rel="stylesheet" href="~/css/admin.css" />
     }
+    @if (ViewContext.RouteData.Values["area"]?.ToString() == "Identity")
+    {
+        <link rel="stylesheet" href="~/css/account.css" />
+    }
     @RenderSection("Styles", required: false)
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="~/asset/img/styleza.png">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-<body class="@(User.Identity.IsAuthenticated ? "logged-in" : "")">
+<body class="@(User.Identity.IsAuthenticated ? "logged-in" : "") @(Context.Request.Path.Value.Contains("/Account/Manage") ? "manage-account-page" : "")">
+
     <!-- Loader -->
     @await Html.PartialAsync("_Loader")
     
@@ -291,7 +296,19 @@
     </header>
 
     <!-- Main Content -->
-    @RenderBody()
+    @if (ViewContext.RouteData.Values["area"]?.ToString() == "Identity" && (ViewContext.RouteData.Values["page"]?.ToString().Contains("/Manage/") == true || ViewContext.RouteData.Values["page"]?.ToString().EndsWith("/Manage") == true))
+    {
+        <div class="manage-account-container">
+            <div class="container manage-content">
+                @RenderBody()
+            </div>
+        </div>
+    }
+    else
+    {
+        @RenderBody()
+    }
+
 
     <!-- Footer -->
     <partial name="_Footer" />

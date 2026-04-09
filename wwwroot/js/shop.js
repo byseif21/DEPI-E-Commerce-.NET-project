@@ -834,36 +834,6 @@ document.addEventListener('DOMContentLoaded', function () {
         totalElement.textContent = `$${cartTotal.toFixed(2)}`;
     }
 
-    // Show notification
-    function showNotification(message) {
-        if (document.querySelector('.notification')) {
-            document.querySelector('.notification').remove();
-        }
-
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas fa-check-circle"></i>
-            <span>${message}</span>
-        </div>
-    `;
-
-        document.body.appendChild(notification);
-
-        // Show notification
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 10);
-
-        // Hide notification after 3 seconds
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
-    }
 
     // Initialize product ratings
     function initProductRatings() {

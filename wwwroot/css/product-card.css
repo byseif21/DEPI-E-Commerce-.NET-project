@@ -74,10 +74,28 @@
 .product-title {
     font-size: 18px;
     font-weight: 500;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.product-rating {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.product-rating i {
+    font-size: 13px;
+    color: #ffc107; /* Standard Star Gold */
+    margin: 5px;
+}
+
+.rating-value {
+    font-size: 12px;
+    color: #888;
+    margin-left: 5px;
 }
 
 .product-price {

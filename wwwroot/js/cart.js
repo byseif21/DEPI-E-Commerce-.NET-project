@@ -189,36 +189,40 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
     
-    // Show notification (Global)
-    window.showNotification = function(message) {
-        // Remove existing notification if any
-        if (document.querySelector('.notification')) {
-            document.querySelector('.notification').remove();
-        }
-        
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.innerHTML = `
-            <div class="notification-content">
-                <i class="fas fa-check-circle"></i>
-                <span>${message}</span>
-            </div>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        // Show notification
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 10);
-        
-        // Hide notification after 3 seconds
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
+}); // End of DOMContentLoaded
+
+// Show notification (Global) - Define outside DOMContentLoaded so it's available immediately
+window.showNotification = function(message) {
+    // Remove existing notification if any
+    const existing = document.querySelector('.notification');
+    if (existing) {
+        existing.remove();
     }
-});
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-check-circle"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Show notification
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // Hide notification after 3 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}

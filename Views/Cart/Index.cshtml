@@ -1,9 +1,14 @@
-﻿@model Styleza.Models.Cart
+@model Styleza.Models.Cart
 
 @{
     ViewData["Title"] = "Cart";
     Layout = "_Layout";
 }
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/cart.css" />
+}
+
 <section class="cart-section">
     <div class="container">
         <h2 class="section-title">Shopping Cart</h2>
@@ -59,13 +64,12 @@
         document.querySelectorAll('.cart-item-remove').forEach(btn => {
             btn.addEventListener('click', async function () {
                 const id = this.dataset.id;
-                const response = await fetch('/Cart/RemoveFromCart', {
+                const response = await fetch(`/Cart/RemoveFromCart?cartItemId=${id}`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
                         'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                    },
-                    body: JSON.stringify({ cartItemId: parseInt(id) })
+                    }
                 });
 
                 if (response.ok) {
