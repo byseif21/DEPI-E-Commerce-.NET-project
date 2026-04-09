@@ -216,6 +216,14 @@
                 <div class="logo">Style<span>Za</span></div>
                 <div class="mobile-close"><i class="fas fa-times"></i></div>
             </div>
+            <div class="mobile-search">
+                <form asp-controller="Products" asp-action="Shop" method="get" class="mobile-search-form">
+                    <input type="text" name="search" placeholder="Search products..." class="mobile-search-input">
+                    <button type="submit" class="mobile-search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
             <ul class="mobile-nav-links">
                 <li class="mobile-nav-item">
                     <a asp-controller="Home" asp-action="Index" class="mobile-nav-link">Home</a>
@@ -265,10 +273,10 @@
                 @if (SignInManager.IsSignedIn(User))
                 {
                     <li class="mobile-nav-item">
-                        <a asp-area="Identity" asp-page="/Account/Manage/Index" class="mobile-nav-link"><i class="far fa-user me-2"></i>My Account</a>
+                        <a asp-area="Identity" asp-page="/Account/Manage/Index" class="mobile-nav-link">My Account</a>
                     </li>
                     <li class="mobile-nav-item">
-                        <a asp-controller="Home" asp-action="Wishlist" class="mobile-nav-link"><i class="far fa-heart me-2"></i>Wishlist</a>
+                        <a asp-controller="Home" asp-action="Wishlist" class="mobile-nav-link">Wishlist</a>
                     </li>
                     <li class="mobile-nav-item">
                         <a href="javascript:void(0);" onclick="showLogoutModal(); return false;" class="mobile-nav-link"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>

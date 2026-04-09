@@ -53,9 +53,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ----- EVENT LISTENERS -----
 
-    // Mobile menu toggle
+    // Mobile menu toggle — uses the shared .mobile-menu from _Layout
     if (hamburger) {
-        hamburger.addEventListener('click', toggleMobileMenu);
+        hamburger.addEventListener('click', () => {
+            const mobileMenu = document.querySelector('.mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        });
     }
 
     // Category filter - Server-side navigation is preferred for SEO and robustness
@@ -249,72 +255,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // ----- FUNCTIONS -----
 
     // Mobile menu toggle function
-    function toggleMobileMenu() {
-        // Check if mobile nav already exists
-        if (document.querySelector('.mobile-nav')) return;
-        
-        const mobileNav = document.createElement('div');
-        mobileNav.className = 'mobile-nav';
-        mobileNav.innerHTML = `
-            <div class="mobile-nav-header">
-                <a href="/" class="logo">Style<span>Za</span></a>
-                <div class="close-menu"><i class="fas fa-times"></i></div>
-            </div>
-            <ul class="mobile-nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/Products/Shop">Shop</a></li>
-                <li><a href="/Home/About">About</a></li>
-                <li><a href="/Home/Blog">Blog</a></li>
-                <li><a href="/Home/Contact">Contact</a></li>
-            </ul>
-            <div class="mobile-nav-footer">
-                <div class="mobile-nav-footer-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-pinterest-p"></i></a>
-                </div>
-            </div>
-        `;
-        
-        // Create overlay for closing when clicking outside
-        const overlay = document.createElement('div');
-        overlay.className = 'mobile-nav-overlay';
-        document.body.appendChild(overlay);
-        
-        document.body.appendChild(mobileNav);
-        document.body.style.overflow = 'hidden';
-
-        setTimeout(() => {
-            mobileNav.classList.add('active');
-            overlay.classList.add('active');
-        }, 10);
-
-        // Close menu when clicking the close button
-        const closeMenu = document.querySelector('.close-menu');
-        closeMenu.addEventListener('click', function () {
-            mobileNav.classList.remove('active');
-            overlay.classList.remove('active');
-            setTimeout(() => {
-                document.body.removeChild(mobileNav);
-                document.body.removeChild(overlay);
-                document.body.style.overflow = '';
-            }, 300);
-        });
-        
-        // Close menu when clicking outside
-        overlay.addEventListener('click', function() {
-            mobileNav.classList.remove('active');
-            overlay.classList.remove('active');
-            setTimeout(() => {
-                document.body.removeChild(mobileNav);
-                document.body.removeChild(overlay);
-                document.body.style.overflow = '';
-            }, 300);
-        });
-
-
-    }
 
     // Update active category
     function updateActiveCategory(clickedCategory) {
