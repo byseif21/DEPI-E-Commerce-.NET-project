@@ -1,7 +1,25 @@
 /* 
-   Styleza - Account Management Styles
-   Clean & Organized Premium Version
+   Styleza - Account & Authentication Styles
 */
+
+/* 0. Standalone Account Pages (Login/Register) */
+.account-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 20px 80px;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/asset/img/bannar-shop.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.account-page .account-form-container {
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+}
 
 /* 1. Main Containers */
 .manage-account-container {

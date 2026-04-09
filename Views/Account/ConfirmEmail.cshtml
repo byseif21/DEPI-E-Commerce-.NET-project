@@ -7,17 +7,14 @@
 }
 
 <div class="account-page">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6 mx-auto">
-                <div class="account-form-container">
-                    <h2 class="text-center mb-4">Email Confirmed</h2>
-                    <p class="text-center mb-4">Thank you for confirming your email. Your account is now active.</p>
-                    <div class="form-group mb-3 text-center">
-                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Continue to Homepage</a>
-                    </div>
-                </div>
-            </div>
+    <div class="account-form-container">
+        <h2>Email Confirmed</h2>
+        <p class="subtitle">Thank you for confirming your email. Your account is now active.</p>
+        
+        <div class="form-footer" style="border:none; padding:0;">
+            <a asp-controller="Home" asp-action="Index" class="btn-login" style="display:block; text-align:center;">
+                <span>Continue Shopping</span>
+            </a>
         </div>
     </div>
 </div>
