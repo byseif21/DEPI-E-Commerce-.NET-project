@@ -31,34 +31,7 @@
             <div class="wishlist-grid">
                 @foreach (var item in Model)
                 {
-                    <div class="product-card" data-product-id="@item.ProductId">
-                        <div class="product-img-container">
-                             <button class="remove-from-wishlist" data-id="@item.Id" title="Remove from wishlist">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <a asp-controller="Products" asp-action="Preview" asp-route-id="@item.ProductId">
-                                <img src="@(item.Product?.Images?.FirstOrDefault(i => i.IsPrimary)?.ImageUrl ?? "/asset/img/default-product.png")"
-                                     alt="@item.Product?.Name" class="product-img" />
-                            </a>
-                        </div>
-                        
-                        <div class="product-info">
-                            <h3 class="product-title"><a asp-controller="Products" asp-action="Preview" asp-route-id="@item.ProductId">@item.Product?.Name</a></h3>
-                            <div class="product-price">
-                                @if (item.Product != null)
-                                {
-                                    <span class="current-price">@item.Product.Price.ToString("C2")</span>
-                                }
-                                else
-                                {
-                                    <span class="current-price">Price N/A</span>
-                                }
-                            </div>
-                            <button class="add-to-cart add-to-cart-btn" data-product-id="@item.ProductId">
-                                <i class="fas fa-shopping-cart"></i> Add to Cart
-                            </button>
-                        </div>
-                    </div>
+                    @await Html.PartialAsync("_ProductCard", item.Product, new ViewDataDictionary(ViewData) { { "IsWishlist", true }, { "WishlistId", item.Id } })
                 }
             </div>
         }

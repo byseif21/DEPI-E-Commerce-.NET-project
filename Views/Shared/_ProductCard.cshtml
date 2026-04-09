@@ -1,0 +1,125 @@
+@model Styleza.Models.Product
+
+@{
+    var placeholderImage = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'><rect width='400' height='400' fill='%23f5f5f5'/><path d='M120 260l55-70 45 55 35-45 65 60H120z' fill='%23d0d0d0'/><circle cx='155' cy='145' r='22' fill='%23d0d0d0'/></svg>";
+    var primaryImage = Model.Images?.FirstOrDefault(i => i.IsPrimary)?.ImageUrl 
+                    ?? Model.ImageUrl 
+                    ?? placeholderImage;
+                    
+    var isWishlistMode = ViewData["IsWishlist"] != null && (bool)ViewData["IsWishlist"];
+    var wishlistId = ViewData["WishlistId"] != null ? ViewData["WishlistId"].ToString() : "";
+}
+
+<div class="product-card" data-product-id="@Model.Id">
+    <div class="product-img-container">
+        @if (isWishlistMode)
+        {
+            <button class="remove-from-wishlist" data-id="@wishlistId" title="Remove from wishlist">
+                <i class="fas fa-times"></i>
+            </button>
+        }
+        else
+        {
+            <div class="product-actions">
+                <div class="product-action">
+                    <a asp-controller="Home" asp-action="AddToWishlist" asp-route-productId="@Model.Id" class="wishlist-btn"><i class="far fa-heart"></i></a>
+                </div>
+                <div class="product-action">
+                    <a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id" class="details-btn"><i class="fas fa-eye"></i></a>
+                </div>
+                <div class="product-action">
+                    <a asp-controller="Products" asp-action="Shop" asp-route-search="@Model.Name" class="search-btn"><i class="fas fa-search"></i></a>
+                </div>
+                <div class="product-action">
+                    <a href="#" class="compare-btn"><i class="fas fa-sync-alt"></i></a>
+                </div>
+            </div>
+            @if (Model.IsNew)
+            {
+                <div class="product-label">New</div>
+            }
+            else if (Model.IsOnSale)
+            {
+                <div class="product-label" style="background-color: #f27d42;">Sale</div>
+            }
+            else if (Model.IsBestSeller)
+            {
+                <div class="product-label" style="background-color: #4caf50;">Best Seller</div>
+            }
+        }
+        
+        <a asp-controller="Products" asp-action="Preview" asp-route-id="@Model.Id">
+            <img src="@primaryImage" class="product-img" alt="@Model.Name">
+        </a>
+
+        @if (!Model.IsInStock || Model.StockQuantity <= 0)
+        {
+            <div class="out-of-stock-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center; color: #ff3838; font-weight: bold; z-index: 2;">Out of Stock</div>
+        }
+    </div>
+    
+    <div class="product-info">
+        @if (Model.Category != null)
+        {
+            <div class="product-category">@(Model.Category.Name ?? Model.Category.ToString())</div>
+        }
+        
+        <h3 class="product-title">
+            <a asp-controller="Products" asp-action="Preview" asp-route-id="@Model.Id" style="color: inherit; text-decoration: none;">@Model.Name</a>
+        </h3>
+        
+        <div class="product-rating">
+            @{
+                var rating = Model.AverageRating;
+                var fullStars = (int)Math.Floor(rating);
+                var hasHalfStar = rating - fullStars >= 0.5;
+                var emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+            }
+            @for (int i = 0; i < fullStars; i++)
+            {
+                <i class="fas fa-star"></i>
+            }
+            @if (hasHalfStar)
+            {
+                <i class="fas fa-star-half-alt"></i>
+            }
+            @for (int i = 0; i < emptyStars; i++)
+            {
+                <i class="far fa-star"></i>
+            }
+            <span class="rating-value">(@rating.ToString("F1"))</span>
+        </div>
+        
+        <div class="product-price">
+            <div class="current-price">$@Model.Price.ToString("F2")</div>
+            @if (Model.OldPrice.HasValue && Model.OldPrice > 0)
+            {
+                <div class="old-price">$@Model.OldPrice.Value.ToString("F2")</div>
+            }
+        </div>
+        
+        @if (!string.IsNullOrEmpty(Model.Description))
+        {
+            <p class="product-description-list" style="display: none;">@Model.Description</p>
+        }
+        
+        @if (isWishlistMode)
+        {
+            <button class="add-to-cart add-to-cart-btn @(Model.IsInStock && Model.StockQuantity > 0 ? "" : "disabled")" data-product-id="@Model.Id">
+                <i class="fas fa-shopping-cart"></i> Add to Cart
+            </button>
+        }
+        else
+        {
+            <form asp-controller="Cart" asp-action="AddToCart" method="post" class="ajax-cart-form">
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <button type="submit" class="add-to-cart @(Model.IsInStock && Model.StockQuantity > 0 ? "" : "disabled")" 
+                        style="border: none; cursor: pointer; width: 100%;" 
+                        data-product-id="@Model.Id"
+                        @(Model.IsInStock && Model.StockQuantity > 0 ? "" : "disabled")>
+                    @(Model.IsInStock && Model.StockQuantity > 0 ? "Add to Cart" : "Out of Stock")
+                </button>
+            </form>
+        }
+    </div>
+</div>

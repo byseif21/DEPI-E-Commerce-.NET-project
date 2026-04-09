@@ -82,6 +82,7 @@ namespace Styleza.Controllers
                 return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("Index", "Home") });
             }
 
+            bool alreadyExists = false;
             // Check if product already exists in wishlist
             var existingItem = _context.Wishlists.FirstOrDefault(w => w.UserId == userId && w.ProductId == productId);
             if (existingItem == null)
@@ -97,14 +98,28 @@ namespace Styleza.Controllers
                 _context.Wishlists.Add(wishlistItem);
                 await _context.SaveChangesAsync();
             }
+            else
+            {
+                alreadyExists = true;
+            }
 
             // If it's an AJAX request, return JSON result
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
                 var product = await _context.Products.FindAsync(productId);
+                string msg;
+                if (alreadyExists)
+                {
+                    msg = product != null ? $"{product.Name} is already in your wishlist!" : "Product is already in your wishlist!";
+                }
+                else
+                {
+                    msg = product != null ? $"{product.Name} added to wishlist!" : "Product added to wishlist!";
+                }
+
                 return Json(new { 
                     success = true, 
-                    message = product != null ? $"{product.Name} added to wishlist!" : "Product added to wishlist!",
+                    message = msg,
                     useLocalStorage = false
                 });
             }

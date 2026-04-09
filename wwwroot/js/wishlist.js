@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Add event listeners to wishlist buttons on product pages
-    const wishlistBtns = document.querySelectorAll('.wishlist-btn, .product-action .fa-heart');
+    const wishlistBtns = document.querySelectorAll('.wishlist-btn');
     wishlistBtns.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();

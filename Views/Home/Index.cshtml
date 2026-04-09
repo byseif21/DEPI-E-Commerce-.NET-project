@@ -83,71 +83,7 @@
         <div class="products-grid">
             @foreach (var product in Model)
             {
-                var placeholderImage = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'><rect width='400' height='400' fill='%23f5f5f5'/><path d='M120 260l55-70 45 55 35-45 65 60H120z' fill='%23d0d0d0'/><circle cx='155' cy='145' r='22' fill='%23d0d0d0'/></svg>";
-                var primaryImage = product.Images.FirstOrDefault(i => i.IsPrimary)?.ImageUrl 
-                                ?? product.ImageUrl 
-                                ?? placeholderImage;
-                var label = product.OldPrice > 0 ? "Sale" : (product.StockQuantity > 0 ? "New" : "Hot");
-                <div class="product-card" data-product-id="@product.Id">
-                    <div class="product-img-container">
-                        <img src="@primaryImage" class="product-img" alt="@product.Name">
-                        <div class="product-actions">
-                            <div class="product-action">
-                                <a asp-controller="Home" asp-action="AddToWishlist" asp-route-productId="@product.Id"><i class="far fa-heart"></i></a>
-                            </div>
-                            <div class="product-action">
-                                <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id"><i class="fas fa-search"></i></a>
-                            </div>
-                            <div class="product-action">
-                                <a href="#" class="compare"><i class="fas fa-sync-alt"></i></a>
-                            </div>
-                            @if (!product.IsInStock || product.StockQuantity <= 0)
-                            {
-                                <div class="out-of-stock-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center; color: #ff3838; font-weight: bold; z-index: 2;">Out of Stock</div>
-                            }
-                        </div>
-                    </div>
-                    <div class="product-info">
-                            <div class="product-category">@product.Category.Name</div>
-                            <h3 class="product-title">@product.Name</h3>
-                            <div class="product-rating">
-                                @{
-                                    var rating = product.AverageRating;
-                                    var fullStars = (int)Math.Floor(rating);
-                                    var hasHalfStar = rating - fullStars >= 0.5;
-                                    var emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-                                }
-                                @for (int i = 0; i < fullStars; i++)
-                                {
-                                    <i class="fas fa-star"></i>
-                                }
-                                @if (hasHalfStar)
-                                {
-                                    <i class="fas fa-star-half-alt"></i>
-                                }
-                                @for (int i = 0; i < emptyStars; i++)
-                                {
-                                    <i class="far fa-star"></i>
-                                }
-                                <span class="rating-value">(@rating.ToString("F1"))</span>
-                            </div>
-                            <div class="product-price">
-                                <div class="current-price">$@product.Price.ToString("F2")</div>
-                                @if (product.OldPrice.HasValue && product.OldPrice > 0)
-                                {
-                                    <div class="old-price">$@product.OldPrice.Value.ToString("F2")</div>
-                                }
-                            </div>
-                            <form asp-controller="Cart" asp-action="AddToCart" method="post" class="ajax-cart-form">
-                                <input type="hidden" name="productId" value="@product.Id" />
-                                <button type="submit" class="add-to-cart @(product.IsInStock && product.StockQuantity > 0 ? "" : "disabled")" 
-                                        style="border: none; cursor: pointer; width: 100%;" 
-                                        @(product.IsInStock && product.StockQuantity > 0 ? "" : "disabled")>
-                                    @(product.IsInStock && product.StockQuantity > 0 ? "Add to Cart" : "Out of Stock")
-                                </button>
-                            </form>
-                    </div>
-                </div>
+                @await Html.PartialAsync("_ProductCard", product)
             }
         </div>
 

@@ -139,6 +139,7 @@ namespace Styleza.Controllers
         {
             var product = await _context.Products
                 .Include(p => p.Images)
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
@@ -146,7 +147,7 @@ namespace Styleza.Controllers
                 return NotFound();
             }
 
-            return View(product);
+            return View("Preview", product);
         }
 
 

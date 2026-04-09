@@ -20,9 +20,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Product elements
     const productCards = document.querySelectorAll('.product-card');
     const addToCartBtns = document.querySelectorAll('.add-to-cart');
-    const wishlistBtns = document.querySelectorAll('.product-action .fa-heart');
-    const quickViewBtns = document.querySelectorAll('.product-action .fa-eye');
-    const compareProductBtns = document.querySelectorAll('.product-action .fa-sync-alt');
+    const wishlistBtns = document.querySelectorAll('.wishlist-btn');
+    const quickViewBtns = document.querySelectorAll('.quick-view-btn');
+    const compareProductBtns = document.querySelectorAll('.compare-btn');
 
     // Cart elements
     const cartIcon = document.querySelector('.nav-icon .fa-shopping-bag');
@@ -225,23 +225,19 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Wishlist functionality
-    wishlistBtns.forEach((btn, index) => {
-        btn.addEventListener('click', function () {
-            toggleWishlist(productCards[index]);
-        });
-    });
 
     // Quick view functionality
     quickViewBtns.forEach((btn, index) => {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
             openQuickView(productCards[index]);
         });
     });
 
     // Compare products functionality
     compareProductBtns.forEach((btn, index) => {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
             toggleCompare(productCards[index]);
         });
     });
